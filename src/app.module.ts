@@ -1,18 +1,15 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { QuizModule } from './modules/quiz/quiz.module';
-import { QuizController } from './modules/quiz/quiz.controller';
 import { Type } from 'class-transformer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
+import { UserModule } from './user/user.module';
+import { PostModule } from './post/post.module';
 
 
 @Module({
-  imports: [
-    QuizModule,
-    TypeOrmModule.forRoot(typeOrmConfig),  
-  ],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule],
   controllers: [AppController],
   providers: [AppService],
 })
