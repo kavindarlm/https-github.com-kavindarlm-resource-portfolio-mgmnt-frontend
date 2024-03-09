@@ -8,7 +8,8 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private userRepo:Repository<User>) {}
+  constructor(@InjectRepository(User) 
+          private userRepo:Repository<User>) {}
 
   create(createUserDto: CreateUserDto) {
     const user=this.userRepo.create(createUserDto);
@@ -38,6 +39,6 @@ export class UserService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} user`;
+    return this.userRepo.delete(id);
   }
 }

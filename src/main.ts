@@ -12,6 +12,7 @@ async function bootstrap() {
     credentials: true
   });
 
+  console.log('Server is running on http://localhost:3000');
   await app.listen(3000);
 }
 bootstrap();

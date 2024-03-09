@@ -30,6 +30,7 @@ export class UserController {
   async login(@Body() createUserDto: CreateUserDto, 
     @Res({passthrough: true}) response: Response
   ){
+    console.log('Incoming Login Request');
     const user = await this.userService.findOne({where: {email: createUserDto.email}});
 
     if (!user) {
