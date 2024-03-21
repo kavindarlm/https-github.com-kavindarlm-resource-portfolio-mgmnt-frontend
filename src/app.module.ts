@@ -6,11 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
-import { SprintModule } from './Sprint_Mgt/sprint.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule ,SprintModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule],
   controllers: [AppController],
   providers: [AppService],
 })
