@@ -7,10 +7,11 @@ import { typeOrmConfig } from './config/typeorm.config';
 import { UserModule } from './user/user.module';
 import { PostModule } from './post/post.module';
 import { ProjectModule } from './project/project.module';
+import { TaskModule } from './task/task.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule, ProjectModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule, ProjectModule, TaskModule],
   controllers: [AppController],
   providers: [AppService],
 })
