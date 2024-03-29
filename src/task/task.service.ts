@@ -38,7 +38,7 @@ export class TaskService {
         return this.taskRepository.delete(taskid);
     }
 
-    async findTasksByProjectId(projectid: number): Promise<Task[]> {
-        return this.taskRepository.find({ where: { projectid : projectid } });
-      }
+    // async findTasksByProjectId(projectid: number): Promise<Task[]> {
+    //     return this.projectRepository.find({ where: { : projectid } });
+    //   }
 }
