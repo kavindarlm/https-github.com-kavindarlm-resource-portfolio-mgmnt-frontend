@@ -1,5 +1,6 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Post } from 'src/post/entities/post.entity';
+import { Resource } from 'src/resource/entities/resource.entity';
 import { User } from 'src/user/entities/user.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
@@ -11,7 +12,7 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     database: 'database1',
     entities: [
         // __dirname + '/../**/*.entity{.ts,.js}',
-        User,Post
+        User,Post,Resource
     ],
     synchronize: true,
     ssl: true,
