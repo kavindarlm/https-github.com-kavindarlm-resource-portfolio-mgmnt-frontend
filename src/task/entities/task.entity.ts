@@ -1,5 +1,5 @@
 import { Project } from "src/project/entities/project.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "tasks" })
 export class Task{
@@ -10,20 +10,21 @@ export class Task{
     taskName: string;
 
     @Column({ type: 'date' })
-    exStartDate: string;
+    exStartDate: string; 
 
     @Column({ type: 'date' })
     exEndDate: string;
 
-    @Column()
+    @Column({ default: 'No description provided' }) 
     taskDescription: string; 
 
     @Column()
     taskAllocationPercentage: number; 
 
-    @Column()
+    @Column({ default: 0 })
     taskProgressPercentage: number;
 
     @ManyToOne(() => Project, (project) => project.tasks)
+    @JoinColumn({ name: 'TaskProjectId' })
     project: Project;
 }
