@@ -5,13 +5,13 @@ import { Post } from '../../post/entities/post.entity';
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    user_id: number;
 
     @Column({nullable: false, default: 'New User'})
-    name: string;
+    user_name: string;
 
     @Column({})
-    email: string;
+    user_email: string;
 
     @Column({})
     password: string;

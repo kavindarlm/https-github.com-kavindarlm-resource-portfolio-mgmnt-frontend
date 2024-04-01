@@ -9,6 +9,14 @@ import { Response,Request } from 'express';
 import { Req } from '@nestjs/common';
 import { request } from 'http';
 
+const generatePassword = (length: number, chars: string): string => {
+  let password = "";
+  for (let i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+};
+
 @Controller('api') 
 export class UserController {
     constructor(private readonly userService: UserService,
@@ -17,13 +25,19 @@ export class UserController {
 
   @Post('register')
   @UsePipes(ValidationPipe)
-  async register(@Body() createUserDto: CreateUserDto) {
-    const hashedPassword = await bcrypt.hashSync(createUserDto.password, 12);
+  async register(@Body() createUserDto: CreateUserDto & { password: string }) {
+    let password = generatePassword(8, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
+    createUserDto.password = password;
+    if (!createUserDto.password) {
+      throw new BadRequestException('Password is required');
+    }
 
-    const user = await this.userService.create({...createUserDto, password: hashedPassword});
+    const hashedPassword = await bcrypt.hashSync(password, 12);
+
+    const user = await this.userService.create({ ...createUserDto, password: hashedPassword });
 
     delete user.password;
-    return user;
+    return password; //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
   }
 
   @Post('login')
@@ -31,7 +45,7 @@ export class UserController {
     @Res({passthrough: true}) response: Response
   ){
     console.log('Incoming Login Request');
-    const user = await this.userService.findOne({where: {email: createUserDto.email}});
+    const user = await this.userService.findOne({where: {email: createUserDto.user_email}});
 
     if (!user) {
       throw new BadRequestException('Invalid credentials');
@@ -41,7 +55,7 @@ export class UserController {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const jwt = await this.jwtService.signAsync({id: user.id});
+    const jwt = await this.jwtService.signAsync({id: user.user_id});
 
     response.cookie('jwt', jwt, {httpOnly: true});
 
@@ -74,6 +88,7 @@ export class UserController {
   @Post('logout')
   async logout(@Res({passthrough: true}) response: Response){
     response.clearCookie('jwt');
+    console.log('Incoming Logout Request');
 
     return {
       message: 'Logout success'
