@@ -32,10 +32,11 @@ export class UserController {
 
     const hashedPassword = await bcrypt.hashSync(password, 12);
 
-    const user = await this.userService.create({ ...createUserDto, password: hashedPassword });
+    const user: { password?: string } = await this.userService.create({ ...createUserDto, password: hashedPassword });
 
     delete user.password;
     return {
+      password: password,
       message: 'User created successfully'
     }
     //return password; //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
@@ -114,8 +115,8 @@ export class UserController {
 
 
   @Patch(':id')
-  updateUser(@Param('id') id : number,@Body() updateUser : UpdateUserDto){
-    return this.userService.updateUserById(id,updateUser);
+  updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
+    return this.userService.updateUserById(id, updateUser);
   }
 
 
