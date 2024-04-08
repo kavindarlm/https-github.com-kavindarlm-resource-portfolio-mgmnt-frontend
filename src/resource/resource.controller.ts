@@ -9,7 +9,7 @@ export class ResourceController {
 
   @Get()
     getResources() {
-        // return this.resourceService.findResources();
+        return this.resourceService.findResources();
     }
 
   @Post()
@@ -17,13 +17,13 @@ export class ResourceController {
         return this.resourceService.createResource(createResourceDto);
     }
 
-    // @Put(':resourceId')  
-    // async updateResourceById(@Param('resourceId') resourceId: string, @Body() updateResourceDto: UpdateResourceDto,) {
-    //    await this.resourceService.updateResource(resourceId, updateResourceDto);
-    // }
+    @Put(':resourceId')  
+    async updateResourceById(@Param('resourceId') resourceId: string, @Body() updateResourceDto: UpdateResourceDto,) {
+       await this.resourceService.updateResource(resourceId, updateResourceDto);
+    }
 
-    // @Delete(':resourceId')
-    // async deleteResourceById(@Param('resourceId') resourceId: string) {
-    //     await this.resourceService.deleteResource(resourceId);
-    //  }
+    @Delete(':resourceId')
+    async deleteResourceById(@Param('resourceId') resourceId: string) {
+        await this.resourceService.deleteResource(resourceId);
+     }
 }

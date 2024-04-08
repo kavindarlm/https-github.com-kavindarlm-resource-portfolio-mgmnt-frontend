@@ -1,15 +1,15 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Resource {
-    @PrimaryGeneratedColumn()
-    id:number;
+    // @PrimaryGeneratedColumn()
+    // id:number;
 
     @Column()
     resourceName: string;
 
-    @Column({unique:true})
-    resourceId: string;
+    @PrimaryColumn({})
+    resourceId: string;//primary column
 
     @Column()
     roleId: number;

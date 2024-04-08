@@ -4,13 +4,12 @@ import { AppService } from './app.service';
 import { Type } from 'class-transformer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
-import { UserModule } from './user/user.module';
-import { PostModule } from './post/post.module';
 import { ResourceModule } from './resource/resource.module';
+import { JobRoleModule } from './job_role/job_role.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule, ResourceModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), ResourceModule, JobRoleModule],
   controllers: [AppController],
   providers: [AppService],
 })
