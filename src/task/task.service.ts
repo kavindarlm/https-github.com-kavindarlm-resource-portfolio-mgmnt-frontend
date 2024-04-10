@@ -40,5 +40,5 @@ export class TaskService {
 
     async findTasksByProjectId(TaskProjectId: number): Promise<Task[]> {
         return this.taskRepository.find({where: {project: {projectid: TaskProjectId}}})
-      }
+    }
 }

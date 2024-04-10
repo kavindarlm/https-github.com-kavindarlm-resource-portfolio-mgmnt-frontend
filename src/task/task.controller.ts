@@ -25,7 +25,7 @@ export class TaskController {
     return this.taskService.createTask(parseInt(projectid, 10), createTaskDto);
   }
 
-  @Get(':id') 
+  @Get(':id')
   getTaskById(@Param('id') taskid: number): Promise<Task> {
     return this.taskService.findTaskById(taskid);
   }
@@ -47,4 +47,4 @@ export class TaskController {
   async getTasksByProjectId(@Param('id') projectId: string): Promise<Task[]> {
     return this.taskService.findTasksByProjectId(parseInt(projectId, 10));
   }
-}
+} 

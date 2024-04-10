@@ -8,7 +8,7 @@ export class Project {
     projectid: number;
 
     @Column()
-    projectName: string;
+    projectName: string; 
 
     @Column({ type: 'date' })
     projectStartDate: string;
