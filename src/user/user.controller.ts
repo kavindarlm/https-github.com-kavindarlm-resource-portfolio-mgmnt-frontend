@@ -7,7 +7,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Res } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { Req } from '@nestjs/common';
-import { request } from 'http';
+import { UsersFunctionService } from '../users_function/users_function.service';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -19,7 +19,7 @@ const generatePassword = (length: number, chars: string): string => {
 
 @Controller('api')
 export class UserController {
-  constructor(private userService: UserService, private jwtService: JwtService) { }
+  constructor(private userService: UserService, private jwtService: JwtService,private readonly usersFunctionService: UsersFunctionService) { }
 
   @Post('register')
   @UsePipes(ValidationPipe)
@@ -32,14 +32,14 @@ export class UserController {
 
     const hashedPassword = await bcrypt.hashSync(password, 12);
 
-    const user: { password?: string } = await this.userService.create({ ...createUserDto, password: hashedPassword });
+    const user: { password?: string, user_id: number } = await this.userService.create({ ...createUserDto, password: hashedPassword });
 
     delete user.password;
     return {
-      password: password,
+      password: password, //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
+      user_id: user.user_id,
       message: 'User created successfully'
     }
-    //return password; //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
   }
 
   @Post('login')
@@ -113,15 +113,16 @@ export class UserController {
   }
 
 
-
+  //update user by id
   @Patch(':id')
   updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
     return this.userService.updateUserById(id, updateUser);
   }
 
-
+  //delete user by id
   @Delete(':id')
-  deleteUser(@Param('id') id: number) {
+  async deleteUser(@Param('id') id: number) {
+    await this.usersFunctionService.deleteUserFunction(id);
     return this.userService.deleteUserById(id);
   }
 }

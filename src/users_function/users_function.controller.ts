@@ -7,28 +7,24 @@ import { UpdateUsersFunctionDto } from './dto/update-users_function.dto';
 export class UsersFunctionController {
   constructor(private readonly usersFunctionService: UsersFunctionService) {}
 
-  @Post()
+  @Post('/registerUsersFunction')
   create(@Body() createUsersFunctionDto: CreateUsersFunctionDto) {
     return this.usersFunctionService.create(createUsersFunctionDto);
   }
 
-  @Get()
-  findAll() {
-    return this.usersFunctionService.findAll();
+  @Get('/getUserFunction/:id')
+  findone(@Param('id') id: string) {
+    return this.usersFunctionService.findFunctionIdByUserId(+id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersFunctionService.findOne(+id);
-  }
-
-  @Patch(':id')
+  @Patch('/updateUserFunction/:id')
   update(@Param('id') id: string, @Body() updateUsersFunctionDto: UpdateUsersFunctionDto) {
-    return this.usersFunctionService.update(+id, updateUsersFunctionDto);
-  }
+    return this.usersFunctionService.updateUserFunction(+id, updateUsersFunctionDto);
+  } 
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersFunctionService.remove(+id);
-  }
+  // @Delete('/deleteUserFunction/:id')
+  // remove(@Param('id') id: string) {
+  //   return this.usersFunctionService.deleteUserFunction(+id);
+  // }
+
 }

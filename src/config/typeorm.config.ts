@@ -14,7 +14,11 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     database: 'database1',
     entities: [
         // __dirname + '/../**/*.entity{.ts,.js}',
-        User,Project,Task,Function,UsersFunction
+        User,
+        // Project,
+        // Task,
+        Function,
+        UsersFunction
     ],
     synchronize: true,
     ssl: true,
