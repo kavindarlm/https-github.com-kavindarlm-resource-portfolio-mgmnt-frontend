@@ -13,6 +13,11 @@ export class JobRoleController {
     return this.jobRoleService.findJobRole();
   }
 
+  @Get(':roleId')
+  async getRoleNameById(@Param('roleId', ParseIntPipe) roleId: number) {
+    return this.jobRoleService.getRoleNameById(roleId);
+  }
+
   @Post()
   createJobRole(@Body() createJobRoleDto: CreateJobRoleDto) {
     return this.jobRoleService.createJobRole(createJobRoleDto);

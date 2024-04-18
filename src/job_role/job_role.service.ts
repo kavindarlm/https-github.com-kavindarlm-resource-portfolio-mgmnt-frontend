@@ -31,6 +31,11 @@ export class JobRoleService {
     return this.jobRoleRepository.delete({ roleId });
   }
 
+  async getRoleNameById(roleId: number): Promise<string | undefined> {
+    const jobRole = await this.jobRoleRepository.findOne({ where: { roleId } });
+    return jobRole?jobRole.roleName: '';
+  }
+
   // create(createJobRoleDto: CreateJobRoleDto) {
   //   return 'This action adds a new jobRole';
   // }
