@@ -10,7 +10,12 @@ export class ResourceController {
   @Get()
     getResources() {
         return this.resourceService.findResources();
-    }
+  }
+
+  @Get(':resourceId')
+  async findOneResource(@Param('resourceId') resourceId: string) {
+    return this.resourceService.findOneResource(resourceId);
+  }
 
   @Post()
     createResource(@Body() createResourceDto: CreateResourceDto) {

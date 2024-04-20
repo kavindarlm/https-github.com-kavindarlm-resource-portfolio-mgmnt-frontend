@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from './entities/resource.entity';
@@ -15,6 +15,14 @@ export class ResourceService {
 
   findResources() {
       return this.resourceRepository.find();
+  }
+
+  async findOneResource(resourceId: string): Promise<Resource> {
+    const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+    if (!resource) {
+      throw new NotFoundException(`Resource with ID ${resourceId} not found.`);
+    }
+    return resource;
   }
 
   createResource(resourceDetails: CreateResourceParams) {
