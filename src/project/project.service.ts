@@ -26,8 +26,12 @@ export class ProjectService {
   }
 
   //Find all projects
-  findPeojects() {
-    return this.projectRepository.find();
+  findPeojects(showProjects: number): Promise<Project[]> {
+    return this.projectRepository
+      .createQueryBuilder('project')
+      .orderBy('project.createdDate', 'DESC')
+      .take(showProjects)
+      .getMany();
   }
 
   //finfProject by ID
@@ -62,7 +66,11 @@ export class ProjectService {
 
   //Count project
   async countProjects(): Promise<number> {
-    return this.projectRepository.count();
+    try {
+      return await this.projectRepository.count();
+    } catch (error) {
+      throw new BadRequestException('Could not count projects');
+    }
   }
 
   //Update project details
@@ -72,25 +80,42 @@ export class ProjectService {
 
   //High critical project count
   async countHighCriticalityProjects(): Promise<number> {
-    return this.projectRepository
-      .createQueryBuilder('project')
-      .where('project.criticality = :criticality', { criticality: 'high' })
-      .getCount();
+    try {
+      return await this.projectRepository
+        .createQueryBuilder('project')
+        .where('project.criticality = :criticality', { criticality: 'high' })
+        .getCount();
+    } catch (error) {
+      throw new BadRequestException('Could not count high criticality projects');
+    }
   }
 
   //Low critical project count
   async countLowCriticalityProjects(): Promise<number> {
-    return this.projectRepository
-      .createQueryBuilder('project')
-      .where('project.criticality = :criticality', { criticality: 'low' })
-      .getCount();
+    try {
+      return await this.projectRepository
+        .createQueryBuilder('project')
+        .where('project.criticality = :criticality', { criticality: 'low' })
+        .getCount();
+    } catch (error) {
+      throw new BadRequestException('Could not count low criticality projects');
+    }
   }
 
   //Medium critical project count
   async countMediumCriticalityProjects(): Promise<number> {
-    return this.projectRepository
-      .createQueryBuilder('project')
-      .where('project.criticality = :criticality', { criticality: 'Medium' })
-      .getCount();
+    try {
+      return await this.projectRepository
+        .createQueryBuilder('project')
+        .where('project.criticality = :criticality', { criticality: 'Medium' })
+        .getCount();
+    } catch (error) {
+      throw new BadRequestException('Could not count medium criticality projects');
+    }
+  }
+
+  //Search Project By Name
+  async searchProject(alias: string) {
+    return this.projectRepository.createQueryBuilder(alias);
   }
 }

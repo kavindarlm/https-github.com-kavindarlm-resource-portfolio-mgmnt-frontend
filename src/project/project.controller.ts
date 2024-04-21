@@ -6,11 +6,13 @@ import {
   Param,
   Delete,
   Put,
+  Req,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
+import { Request } from 'express';
 
 @Controller('project')
 export class ProjectController {
@@ -18,7 +20,7 @@ export class ProjectController {
 
   @Get()
     getPeojects(){
-        return this.projectService.findPeojects();
+        return this.projectService.findPeojects(15);
     }
 
   @Post()
@@ -65,5 +67,16 @@ export class ProjectController {
   @Get('Medium-criticality/count')
   async countMediumCriticalityProjects(): Promise<number> {
     return this.projectService.countMediumCriticalityProjects();
+  }
+
+  @Get('searchprojectName/search')
+  async searchProjects(@Req() req: Request){
+    const builder = await this.projectService.searchProject('projects');;
+
+    if(req.query.s){
+      builder.where('projects.projectName like :s', {s: `%${req.query.s}%`});
+    }
+
+    return builder.getMany(); 
   }
 }

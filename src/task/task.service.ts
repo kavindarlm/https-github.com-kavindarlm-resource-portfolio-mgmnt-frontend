@@ -14,31 +14,55 @@ export class TaskService {
     ){}
 
     async createTask(prjectid: number, createTaskDetails:createTaskDto){
-        const project = await this.projectRepository.findOne({ where: { projectid: prjectid } });
-        if (!project) {
-            throw new NotFoundException(`Project with ID ${prjectid} not found`);
+        try {
+            const project = await this.projectRepository.findOne({ where: { projectid: prjectid } });
+            if (!project) {
+                throw new NotFoundException(`Project with ID ${prjectid} not found`);
+            }
+            const newTask = this.taskRepository.create({...createTaskDetails, project});
+            return await this.taskRepository.save(newTask);
+        } catch (error) {
+            throw new NotFoundException('Could not create task');
         }
-        const newTask = this.taskRepository.create({...createTaskDetails, project});
-        return this.taskRepository.save(newTask);
     }
 
     async findTaskById(taskid: number): Promise<Task> {
-        const task = await this.taskRepository.findOne({ where: { taskid: taskid } });
-        if (!task) {
-            throw new NotFoundException(`Task with ID ${taskid} not found`);
+        try {
+            const task = await this.taskRepository.findOne({ where: { taskid: taskid } });
+            if (!task) {
+                throw new NotFoundException(`Task with ID ${taskid} not found`);
+            }
+            return task;
+        } catch (error) {
+            throw new NotFoundException('Could not find task');
         }
-        return task;
     }
 
-    updateTask(taskid:string, updateTaskDetails: updateTaskDto){
-        return this.taskRepository.update(taskid, updateTaskDetails);
+    async updateTask(taskid:string, updateTaskDetails: updateTaskDto){
+        try {
+            return await this.taskRepository.update(taskid, updateTaskDetails);
+        } catch (error) {
+            throw new NotFoundException('Could not update task');
+        }
     }
 
-    deleteTask(taskid: string){
-        return this.taskRepository.delete(taskid);
+    async deleteTask(taskid: string){
+        try {
+            const deleteResult = await this.taskRepository.delete(taskid);
+            if (deleteResult.affected === 0) {
+                throw new NotFoundException(`Task with ID ${taskid} not found`);
+            }
+            return deleteResult;
+        } catch (error) {
+            throw new NotFoundException('Could not delete task');
+        }
     }
 
     async findTasksByProjectId(TaskProjectId: number): Promise<Task[]> {
-        return this.taskRepository.find({where: {project: {projectid: TaskProjectId}}})
+        try {
+            return await this.taskRepository.find({where: {project: {projectid: TaskProjectId}}});
+        } catch (error) {
+            throw new NotFoundException('Could not find tasks for the project');
+        }
     }
 }
