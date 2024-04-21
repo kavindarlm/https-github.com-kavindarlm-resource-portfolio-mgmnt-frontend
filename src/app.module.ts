@@ -5,13 +5,12 @@ import { Type } from 'class-transformer';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { typeOrmConfig } from './config/typeorm.config';
 import { UserModule } from './user/user.module';
-import { PostModule } from './post/post.module';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, PostModule, ProjectModule, TaskModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, ProjectModule, TaskModule],
   controllers: [AppController],
   providers: [AppService],
 })

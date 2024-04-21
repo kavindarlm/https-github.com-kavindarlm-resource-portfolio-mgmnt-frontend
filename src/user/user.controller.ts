@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { Res } from '@nestjs/common';
-import { Response,Request } from 'express';
+import { Response, Request } from 'express';
 import { Req } from '@nestjs/common';
 import { request } from 'http';
 
@@ -17,11 +17,9 @@ const generatePassword = (length: number, chars: string): string => {
   return password;
 };
 
-@Controller('api') 
+@Controller('api')
 export class UserController {
-    constructor(private readonly userService: UserService,
-    private jwtService: JwtService
-    ) {}
+  constructor(private userService: UserService, private jwtService: JwtService) { }
 
   @Post('register')
   @UsePipes(ValidationPipe)
@@ -37,15 +35,18 @@ export class UserController {
     const user = await this.userService.create({ ...createUserDto, password: hashedPassword });
 
     delete user.password;
-    return password; //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
+    return {
+      message: 'User created successfully'
+    }
+    //return password; //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
   }
 
   @Post('login')
-  async login(@Body() createUserDto: CreateUserDto, 
-    @Res({passthrough: true}) response: Response
-  ){
+  async login(@Body() createUserDto: CreateUserDto,
+    @Res({ passthrough: true }) response: Response
+  ) {
     console.log('Incoming Login Request');
-    const user = await this.userService.findOne({where: {email: createUserDto.user_email}});
+    const user = await this.userService.findLoginUser({ where: { email: createUserDto.user_email } });
 
     if (!user) {
       throw new BadRequestException('Invalid credentials');
@@ -55,9 +56,9 @@ export class UserController {
       throw new BadRequestException('Invalid credentials');
     }
 
-    const jwt = await this.jwtService.signAsync({id: user.user_id});
+    const jwt = await this.jwtService.signAsync({ id: user.user_id });
 
-    response.cookie('jwt', jwt, {httpOnly: true});
+    response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
       message: 'Login success'
@@ -65,28 +66,29 @@ export class UserController {
   }
 
 
-
+  //get user details after login
   @Get('user')
-  async user (@Req() request: Request){
-    try{
-    const cookie = request.cookies['jwt'];
-    const data = await this.jwtService.verifyAsync(cookie);
-    if (!data) {
-      throw new UnauthorizedException('Unauthorized');
-    }
+  async user(@Req() request: Request) {
+    try {
+      const cookie = request.cookies['jwt'];
+      const data = await this.jwtService.verifyAsync(cookie);
+      if (!data) {
+        throw new UnauthorizedException('Unauthorized');
+      }
 
-    const user = await this.userService.findOne({where: {id: data['id']}});
-    const {password, ...result} = user;
+      const user = await this.userService.findLoginUser({ where: { id: data['id'] } });
+      const { password, ...result } = user;
 
-    return result;
+      return result;
 
     } catch (e) {
       throw new UnauthorizedException('Unauthorized');
     }
   }
 
+  //logout
   @Post('logout')
-  async logout(@Res({passthrough: true}) response: Response){
+  async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt');
     console.log('Incoming Logout Request');
 
@@ -96,27 +98,29 @@ export class UserController {
   }
 
 
-
-
-
-
-  @Get()
+  //find all users
+  @Get('findAll')
   findAll() {
     return this.userService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: number) {
-  //   return this.userService.findOne(+id);
-  // }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(+id, updateUserDto);
+  //find single user by id
+  @Get('find/:id')
+  findSingleUser(@Param('id') id: number) {
+    return this.userService.findUserById(id);
   }
 
+
+
+  @Patch(':id')
+  updateUser(@Param('id') id : number,@Body() updateUser : UpdateUserDto){
+    return this.userService.updateUserById(id,updateUser);
+  }
+
+
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.userService.remove(+id);
+  deleteUser(@Param('id') id: number) {
+    return this.userService.deleteUserById(id);
   }
 }

@@ -16,29 +16,26 @@ export class UserService {
     return this.userRepo.save(user);
   }
 
-  // findAll() {
-  //   const allusers=this.userRepo.find({where:{name:'malintha'}});
-  //   return allusers;
-  // }
   findAll() {
     const allusers=this.userRepo.find();
     return allusers;
   }
 
-  async findOne(condition: any): Promise<User> {
+
+  async findLoginUser(condition: any): Promise<User> {
     return await this.userRepo.findOne(condition);
   }
 
-  // findOne(id: number) {
-  //   const user=this.userRepo.findOne({where:{id:id}});
-  //   return user;
-  // }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  findUserById(id: number): Promise<User> {
+    const user = this.userRepo.findOne({where: {user_id: id}});
+    return user;
   }
 
-  remove(id: number) {
+  updateUserById(id : number, updateUserDto: UpdateUserDto) {
+    return this.userRepo.update(id, updateUserDto);
+  }
+
+  deleteUserById(id: number) {
     return this.userRepo.delete(id);
   }
 }
