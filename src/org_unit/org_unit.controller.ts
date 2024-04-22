@@ -22,10 +22,6 @@ export class OrgUnitController {
     return this.orgUnitService.getUnitNameById(unitId);
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.orgUnitService.findOne(+id);
-  // }
 
   @Put(':unitId')
   async updateOrgUnitById(@Param('unitId', ParseIntPipe) unitId: number, @Body() updateOrgUnitDto: UpdateOrgUnitDto) {
