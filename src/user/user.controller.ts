@@ -47,7 +47,7 @@ export class UserController {
     @Res({ passthrough: true }) response: Response
   ) {
     console.log('Incoming Login Request');
-    const user = await this.userService.findLoginUser({ where: { email: createUserDto.user_email } });
+    const user = await this.userService.findLoginUser({ where: { user_email: createUserDto.user_email } });
 
     if (!user) {
       throw new BadRequestException('Invalid credentials');
