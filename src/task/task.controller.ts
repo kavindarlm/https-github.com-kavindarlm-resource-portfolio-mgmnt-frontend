@@ -11,7 +11,7 @@ import {
 import { TaskService } from './task.service';
 import { createTaskDto } from './dto/createTask.dto';
 import { Task } from './entities/task.entity';
-import { updateTaskDto } from './dto/updateTask.dto';
+import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 
 @Controller('task')
 export class TaskController {
@@ -46,5 +46,13 @@ export class TaskController {
   @Get('project/:id') // Endpoint to get tasks by project ID
   async getTasksByProjectId(@Param('id') projectId: string): Promise<Task[]> {
     return this.taskService.findTasksByProjectId(parseInt(projectId, 10));
+  }
+
+  @Put('updateTaskProgress/:id') // Endpoint to update task progress
+  async updateTaskProgress(
+    @Param('id') taskId: string,
+    @Body() updateTaskDto: updateTaskDetailsDto,
+  ){
+    await this.taskService.updateTaskDetails(taskId, updateTaskDto);
   }
 } 

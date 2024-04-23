@@ -4,7 +4,7 @@ import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
 import { Project } from 'src/project/entities/project.entity';
 import { createTaskDto } from './dto/createTask.dto';
-import { updateTaskDto } from './dto/updateTask.dto';
+import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 
 @Injectable()
 export class TaskService {
@@ -13,6 +13,8 @@ export class TaskService {
         @InjectRepository(Project) private projectRepository: Repository<Project>
     ){}
 
+
+    //service for creating task
     async createTask(prjectid: number, createTaskDetails:createTaskDto){
         try {
             const project = await this.projectRepository.findOne({ where: { projectid: prjectid } });
@@ -26,6 +28,7 @@ export class TaskService {
         }
     }
 
+    //service for find task by id
     async findTaskById(taskid: number): Promise<Task> {
         try {
             const task = await this.taskRepository.findOne({ where: { taskid: taskid } });
@@ -38,6 +41,7 @@ export class TaskService {
         }
     }
 
+    //service for updating task Progress
     async updateTask(taskid:string, updateTaskDetails: updateTaskDto){
         try {
             return await this.taskRepository.update(taskid, updateTaskDetails);
@@ -46,6 +50,7 @@ export class TaskService {
         }
     }
 
+    //service for deleting task
     async deleteTask(taskid: string){
         try {
             const deleteResult = await this.taskRepository.delete(taskid);
@@ -58,11 +63,21 @@ export class TaskService {
         }
     }
 
+    //service for find tasks of project by id
     async findTasksByProjectId(TaskProjectId: number): Promise<Task[]> {
         try {
             return await this.taskRepository.find({where: {project: {projectid: TaskProjectId}}});
         } catch (error) {
             throw new NotFoundException('Could not find tasks for the project');
+        }
+    }
+
+    //service for update task Details
+    async updateTaskDetails(taskid: string, updateTaskDetails: updateTaskDetailsDto){
+        try {
+            return await this.taskRepository.update(taskid, updateTaskDetails);
+        } catch (error) {
+            throw new NotFoundException('Could not update task details');
         }
     }
 }
