@@ -1,6 +1,9 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Project } from 'src/project/entities/project.entity';
-import { Task } from 'src/task/entities/task.entity';
+import { Task } from 'src/task/entities/task.entity'; // import task entity
+import { User } from 'src/user/entities/user.entity';
+import { Function } from 'src/functions/entities/function.entity';
+import { UsersFunction } from 'src/users_function/entities/users_function.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
@@ -11,7 +14,11 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     database: 'database1',
     entities: [
         // __dirname + '/../**/*.entity{.ts,.js}',
-        Project,Task
+        Project,
+        Task,
+        User,
+        Function,
+        UsersFunction,
     ],
     synchronize: true,
     ssl: true,
