@@ -1,6 +1,4 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
-import { Project } from 'src/project/entities/project.entity';
-import { Task } from 'src/task/entities/task.entity';
 import { User } from 'src/user/entities/user.entity';
 import { Function } from 'src/functions/entities/function.entity';
 import { UsersFunction } from 'src/users_function/entities/users_function.entity';
@@ -15,8 +13,6 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     entities: [
         // __dirname + '/../**/*.entity{.ts,.js}',
         User,
-        // Project,
-        // Task,
         Function,
         UsersFunction
     ],
