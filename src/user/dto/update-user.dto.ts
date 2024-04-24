@@ -9,4 +9,3 @@ export class UpdateUserDto {
     user_email: string;
 
 }
- 
