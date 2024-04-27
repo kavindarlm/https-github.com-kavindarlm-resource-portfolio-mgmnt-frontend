@@ -126,7 +126,7 @@ export class UserController {
     return this.userService.deleteUserById(id);
   }
 
-  //  controller for searching projects by project name
+  //  controller for searching users by user name
   @Get('searchUserName/search')
   async searchUsers(@Req() req: Request){
     const builder = await this.userService.searchUser('user_name');;
