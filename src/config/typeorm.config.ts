@@ -1,4 +1,7 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { JobRole } from 'src/job_role/entities/job_role.entity';
+import { OrgUnit } from 'src/org_unit/entities/org_unit.entity';
+import { Resource } from 'src/resource/entities/resource.entity';
 import { Project } from 'src/project/entities/project.entity';
 import { Task } from 'src/task/entities/task.entity'; // import task entity
 import { User } from 'src/user/entities/user.entity';
@@ -14,6 +17,9 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
     database: 'database1',
     entities: [
         // __dirname + '/../**/*.entity{.ts,.js}',
+        Resource, 
+        JobRole, 
+        OrgUnit,
         Project,
         Task,
         User,
