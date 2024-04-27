@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { CreateOrgUnitDto, CreateOrgUnitParams } from './dto/create-org_unit.dto';
-import { UpdateOrgUnitDto, UpdateOrgUnitParams } from './dto/update-org_unit.dto';
+import { CreateOrgUnitParams } from './dto/create-org_unit.dto';
+import { UpdateOrgUnitParams } from './dto/update-org_unit.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgUnit } from './entities/org_unit.entity';
 import { Repository } from 'typeorm';
@@ -54,4 +54,28 @@ export class OrgUnitService {
   // remove(id: number) {
   //   return `This action removes a #${id} orgUnit`;
   // }
+
+  async getOrgUnitHierarchy(): Promise<any> {
+    const orgUnits = await this.orgUnitRepository.find();
+    const hierarchy = this.buildHierarchy(orgUnits, null);
+    return hierarchy.length > 0 ? hierarchy[0] : null; // Return the first element if the hierarchy is not empty, otherwise return null
+  }
+  
+
+  private buildHierarchy(orgUnits: OrgUnit[], parentId: number | null): any {
+    const result: any[] = [];
+    orgUnits.forEach(unit => {
+      if (unit.parentId === parentId) {
+        const children = this.buildHierarchy(orgUnits, unit.unitId);
+        result.push({
+          unitName: unit.unitName,
+          unitId: unit.unitId,
+          parentId: unit.parentId,
+          description: unit.description,
+          children: children
+        });
+      }
+    });
+    return result;
+  }
 }

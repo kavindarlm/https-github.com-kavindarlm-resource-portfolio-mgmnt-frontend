@@ -2,6 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe } 
 import { OrgUnitService } from './org_unit.service';
 import { CreateOrgUnitDto } from './dto/create-org_unit.dto';
 import { UpdateOrgUnitDto } from './dto/update-org_unit.dto';
+import { relative } from 'path/win32';
 
 @Controller('org-unit')
 export class OrgUnitController {
@@ -39,4 +40,9 @@ export class OrgUnitController {
   //   return this.orgUnitService.update(+id, updateOrgUnitDto);
   // }
 
+  @Get('hierarchy/data')
+  async getOrgUnitHierarchy(): Promise<any> {
+    return this.orgUnitService.getOrgUnitHierarchy();
+    // return "Hierarchy";
+  }
 }
