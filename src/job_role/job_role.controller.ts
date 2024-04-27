@@ -34,14 +34,4 @@ export class JobRoleController {
   }
 
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.jobRoleService.findOne(+id);
-  // }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateJobRoleDto: UpdateJobRoleDto) {
-  //   return this.jobRoleService.update(+id, updateJobRoleDto);
-  // }
-
 }

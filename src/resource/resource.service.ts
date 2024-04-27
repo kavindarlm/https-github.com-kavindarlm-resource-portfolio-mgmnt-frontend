@@ -4,7 +4,9 @@ import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from './entities/resource.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { CreateResourceParams, UpdateResourceParams } from 'src/utils/types';
+// import { CreateResourceParams, UpdateResourceParams } from 'src/utils/types';
+import { CreateResourceParams } from './dto/create-resource.dto';
+import { UpdateResourceParams } from './dto/update-resource.dto';
 
 @Injectable()
 export class ResourceService {

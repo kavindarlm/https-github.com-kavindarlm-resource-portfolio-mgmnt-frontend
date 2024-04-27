@@ -4,7 +4,9 @@ import { UpdateJobRoleDto } from './dto/update-job_role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JobRole } from './entities/job_role.entity';
 import { Repository } from 'typeorm';
-import { CreateJobRoleParams, UpdateJobRoleParams } from 'src/utils/types';
+// import { CreateJobRoleParams, UpdateJobRoleParams } from 'src/utils/types';
+import { CreateJobRoleParams } from './dto/create-job_role.dto';
+import { UpdateJobRoleParams } from './dto/update-job_role.dto';
 
 @Injectable()
 export class JobRoleService {

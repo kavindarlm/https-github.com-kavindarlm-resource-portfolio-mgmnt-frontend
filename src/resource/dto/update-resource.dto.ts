@@ -5,7 +5,14 @@ export class UpdateResourceDto {
     resourceName: string;
     resourceId: string;
     roleId: number;
-    // jobRole: string;
     unitId: number;
-    // orgUnit: string;
+    teamId: number;
 }
+
+export type UpdateResourceParams = {
+    resourceName: string;
+    resourceId: string;
+    roleId: number;
+    unitId: number;
+    teamId: number;
+};

@@ -35,10 +35,6 @@ export class OrgUnitController {
     await this.orgUnitService.deleteOrgUnit(unitId);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOrgUnitDto: UpdateOrgUnitDto) {
-  //   return this.orgUnitService.update(+id, updateOrgUnitDto);
-  // }
 
   @Get('hierarchy/data')
   async getOrgUnitHierarchy(): Promise<any> {

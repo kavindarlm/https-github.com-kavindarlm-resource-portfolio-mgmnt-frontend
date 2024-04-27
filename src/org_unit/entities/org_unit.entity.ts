@@ -18,7 +18,4 @@ export class OrgUnit {
     @Column()
     createdAt: Date;
 
-    @Column({ default : 1 })
-    createdBy: number;
-
 }

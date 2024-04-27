@@ -34,27 +34,6 @@ export class OrgUnitService {
     return orgUnit? orgUnit.unitName: '';
   }
 
-
-  // create(createOrgUnitDto: CreateOrgUnitDto) {
-  //   return 'This action adds a new orgUnit';
-  // }
-
-  // findAll() {
-  //   return `This action returns all orgUnit`;
-  // }
-
-  // findOne(id: number) {
-  //   return `This action returns a #${id} orgUnit`;
-  // }
-
-  // update(id: number, updateOrgUnitDto: UpdateOrgUnitDto) {
-  //   return `This action updates a #${id} orgUnit`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} orgUnit`;
-  // }
-
   async getOrgUnitHierarchy(): Promise<any> {
     const orgUnits = await this.orgUnitRepository.find();
     const hierarchy = this.buildHierarchy(orgUnits, null);

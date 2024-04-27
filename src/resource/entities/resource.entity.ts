@@ -3,17 +3,20 @@ import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 @Entity()
 export class Resource {
 
+    @PrimaryColumn()
+    resourceId: string;//primary column
+
     @Column()
     resourceName: string;
-
-    @PrimaryColumn({})
-    resourceId: string;//primary column
 
     @Column()
     roleId: number;
 
-    @Column({nullable:true})
+    @Column()
     unitId: number;
+
+    @Column({nullable: true})
+    teamId: number;
 
     @Column()
     createdAt: Date;
