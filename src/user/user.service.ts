@@ -43,4 +43,8 @@ export class UserService {
     return this.userRepo.delete(id);
   }
 
+  async searchUser(alias: string) {
+    return this.userRepo.createQueryBuilder(alias);
+  }
+
 }

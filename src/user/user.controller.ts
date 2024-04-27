@@ -125,4 +125,15 @@ export class UserController {
     await this.usersFunctionService.deleteUserFunction(id);
     return this.userService.deleteUserById(id);
   }
+
+  //  controller for searching projects by project name
+  @Get('searchUserName/search')
+  async searchUsers(@Req() req: Request){
+    const builder = await this.userService.searchUser('user_name');;
+
+    if(req.query.s){
+      builder.where('user_name.user_name like :s', {s: `%${req.query.s}%`});
+    }
+    return builder.getMany(); 
+  }
 }
