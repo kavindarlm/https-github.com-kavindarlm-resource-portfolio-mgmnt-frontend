@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,37 +8,43 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) 
-          private userRepo:Repository<User>) {}
+  constructor(@InjectRepository(User)
+  private userRepo: Repository<User>) { }
 
-  create(createUserDto: CreateUserDto) {
-    const user=this.userRepo.create(createUserDto);
+  async create(createUserDto: CreateUserDto) {
+    const existingUser = await this.userRepo.findOne({ where: { user_email: createUserDto.user_email } });
+    if (existingUser) {
+      throw new BadRequestException('Email already exists');
+    }
+    const user = this.userRepo.create(createUserDto);
     return this.userRepo.save(user);
   }
 
-  // findAll() {
-  //   const allusers=this.userRepo.find({where:{name:'malintha'}});
-  //   return allusers;
-  // }
   findAll() {
-    const allusers=this.userRepo.find();
+    const allusers = this.userRepo.find();
     return allusers;
   }
 
-  async findOne(condition: any): Promise<User> {
+
+  async findLoginUser(condition: any): Promise<User> {
     return await this.userRepo.findOne(condition);
   }
 
-  // findOne(id: number) {
-  //   const user=this.userRepo.findOne({where:{id:id}});
-  //   return user;
-  // }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  findUserById(id: number): Promise<User> {
+    const user = this.userRepo.findOne({ where: { user_id: id } });
+    return user;
   }
 
-  remove(id: number) {
+  updateUserById(id: number, updateUserDto: UpdateUserDto) {
+    return this.userRepo.update(id, updateUserDto);
+  }
+
+  deleteUserById(id: number) {
     return this.userRepo.delete(id);
   }
+
+  async searchUser(alias: string) {
+    return this.userRepo.createQueryBuilder(alias);
+  }
+
 }
