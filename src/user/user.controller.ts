@@ -8,6 +8,7 @@ import { Res } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { Req } from '@nestjs/common';
 import { UsersFunctionService } from '../users_function/users_function.service';
+import * as nodemailer from 'nodemailer';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -16,6 +17,14 @@ const generatePassword = (length: number, chars: string): string => {
   }
   return password;
 };
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'malinthakavinda24@gmail.com',
+    pass: 'hxaynheaabsbghaj'
+  }
+});
 
 @Controller('api')
 export class UserController {
@@ -34,7 +43,26 @@ export class UserController {
 
     const user: { password?: string, user_id: number } = await this.userService.create({ ...createUserDto, password: hashedPassword });
 
-    delete user.password;
+    // delete user.password;
+
+    const mailOptions = {
+      from: 'malinthakavinda24@gmail.com',
+      to: createUserDto.user_email,
+      subject: 'Tapro Project & Resource management system',
+      html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
+       <h3 style="color: blue;">Your password :</h3>
+       <h3><b style="color: red;">${password}</b></h3>`,
+    };
+  
+    transporter.sendMail(mailOptions, function(error, info){
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
+
     return {
       password: password, //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
       user_id: user.user_id,
