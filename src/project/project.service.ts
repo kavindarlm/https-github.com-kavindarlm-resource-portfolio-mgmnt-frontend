@@ -16,9 +16,9 @@ export class ProjectService {
   ) {}
 
   //Create Project
-  async createProject(userDetails: CreateProjectDto) {
+  async createProject(createProjectDto: CreateProjectDto) {
     try {
-      const newPoject = this.projectRepository.create(userDetails);
+      const newPoject = this.projectRepository.create(createProjectDto);
       return this.projectRepository.save(newPoject);
     } catch (error) {
       throw new BadRequestException('Could not create the project');
@@ -83,7 +83,7 @@ export class ProjectService {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
-        .where('project.criticality = :criticality', { criticality: 'high' })
+        .where('project.criticality_id = :criticality_id', { criticality_id: '1' })
         .getCount();
     } catch (error) {
       throw new BadRequestException('Could not count high criticality projects');
@@ -95,7 +95,7 @@ export class ProjectService {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
-        .where('project.criticality = :criticality', { criticality: 'low' })
+        .where('project.criticality_id = :criticality_id', { criticality_id: '3' })
         .getCount();
     } catch (error) {
       throw new BadRequestException('Could not count low criticality projects');
@@ -107,7 +107,7 @@ export class ProjectService {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
-        .where('project.criticality = :criticality', { criticality: 'Medium' })
+        .where('project.criticality_id = :criticality_id', { criticality_id: '2' })
         .getCount();
     } catch (error) {
       throw new BadRequestException('Could not count medium criticality projects');
