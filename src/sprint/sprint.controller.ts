@@ -5,30 +5,18 @@ import { UpdateSprintDto } from './dto/update-sprint.dto';
 
 @Controller('sprint')
 export class SprintController {
-  constructor(private readonly sprintService: SprintService) {}
-
-  // @Post()
-  // create(@Body() createSprintDto: CreateSprintDto) {
-  //   return this.sprintService.create(createSprintDto);
-  // }
+  constructor(private readonly sprintService: SprintService) { }
 
   @Get()
   findAll() {
     return this.sprintService.findAll();
   }
 
-  // @Get(':id')
-  // findOne(@Param('id') id: string) {
-  //   return this.sprintService.findOne(+id);
-  // }
+  @Post()
+  async create(@Body() createSprintDto: CreateSprintDto) {
+    // Use the sprintService to create a new sprint
+    return await this.sprintService.create(createSprintDto);
+  }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateSprintDto: UpdateSprintDto) {
-  //   return this.sprintService.update(+id, updateSprintDto);
-  // }
 
-  // @Delete(':id')
-  // remove(@Param('id') id: string) {
-  //   return this.sprintService.remove(+id);
-  // }
 }

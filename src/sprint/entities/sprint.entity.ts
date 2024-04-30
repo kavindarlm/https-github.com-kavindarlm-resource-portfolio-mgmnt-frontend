@@ -13,4 +13,7 @@ export class Sprint {
 
     @Column({ type: 'date' }) 
     end_Date: Date;
+
+    @Column()
+    createdAt: Date;
 }

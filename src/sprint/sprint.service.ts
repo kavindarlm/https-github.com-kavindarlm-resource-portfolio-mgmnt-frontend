@@ -1,26 +1,34 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Sprint } from './entities/sprint.entity';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 import { UpdateSprintDto } from './dto/update-sprint.dto';
 
 @Injectable()
 export class SprintService {
-  // create(createSprintDto: CreateSprintDto) {
-  //   return 'This action adds a new sprint';
-  // }
 
-  findAll() {
-    return `This action returns all sprint`;
+  constructor(
+    @InjectRepository(Sprint)
+    private sprintRepository: Repository<Sprint>, // Inject the Sprint repository
+  ) { }
+
+  async findAll(): Promise<Sprint[]> {
+    // Use the repository to find all sprints in the database
+    return this.sprintRepository.find();
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} sprint`;
-  // }
+  
 
-  // update(id: number, updateSprintDto: UpdateSprintDto) {
-  //   return `This action updates a #${id} sprint`;
-  // }
+  async create(createSprintDto: CreateSprintDto): Promise<Sprint> {
+    // Create a new Sprint instance using the DTO
+    const sprint = this.sprintRepository.create(createSprintDto);
 
-  // remove(id: number) {
-  //   return `This action removes a #${id} sprint`;
-  // }
+    // Set the createdAt date to today's date
+    sprint.createdAt = new Date();
+
+    // Save the sprint to the database
+    return this.sprintRepository.save(sprint);
+  }
+
 }

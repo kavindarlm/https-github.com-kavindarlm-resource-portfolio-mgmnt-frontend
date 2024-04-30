@@ -1,4 +1,7 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
+import { JobRole } from "src/job_role/entities/job_role.entity";
+import { Team } from "src/team/entities/team.entity";
+import { OrgUnit } from "src/org_unit/entities/org_unit.entity";
 
 @Entity()
 export class Resource {
@@ -9,14 +12,20 @@ export class Resource {
     @Column()
     resourceName: string;
 
-    @Column()
-    roleId: number;
 
-    @Column()
-    unitId: number;
+    @ManyToOne(() => Team)
+    @JoinColumn({ name: 'team_id' })
+    teams: Team;
 
-    @Column({nullable: true})
-    teamId: number;
+
+    @ManyToOne(() => JobRole)
+    @JoinColumn({ name: 'roleId' })
+    job_role: JobRole;
+
+
+    @ManyToOne(() => OrgUnit)
+    @JoinColumn({ name: 'unitId' })
+    org_unit: OrgUnit;
 
     @Column()
     createdAt: Date;

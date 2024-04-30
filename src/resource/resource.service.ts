@@ -15,8 +15,15 @@ export class ResourceService {
   constructor(@InjectRepository(Resource) private resourceRepository: Repository<Resource>,) {}
 
 
-  findResources() {
-      return this.resourceRepository.find();
+  async findResources(): Promise<Resource[]> {
+    // Use the repository to find resources and include the necessary relations
+    return this.resourceRepository.find({
+      relations: ['teams', 'job_role', 'org_unit'], // Include relations for team, job role, and org unit
+    });
+  }
+
+  async findMany(): Promise<Resource[]> {
+    return this.resourceRepository.find({ relations: ['job_role', 'org_unit', 'teams'] });
   }
 
   async findOneResource(resourceId: string): Promise<Resource> {
