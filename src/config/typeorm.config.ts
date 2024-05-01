@@ -12,6 +12,7 @@ import { Function } from 'src/functions/entities/function.entity';
 import { UsersFunction } from 'src/users_function/entities/users_function.entity';
 import { Criticality } from 'src/criticality/entities/criticality.entity';
 import { Sprint } from 'src/sprint/entities/sprint.entity';
+import { ResourceAllocation } from 'src/resource_allocation/entities/resource_allocation.entity';
 
 export const typeOrmConfig: TypeOrmModuleOptions = {
     type: 'mysql',
@@ -34,7 +35,8 @@ export const typeOrmConfig: TypeOrmModuleOptions = {
         Function,
         UsersFunction,
         Criticality,
-        Sprint
+        Sprint,
+        ResourceAllocation
     ],
     synchronize: true,
     ssl: true,

@@ -17,6 +17,12 @@ import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
+  @Get(':taskId')
+  async getProjectIdByTaskId(@Param('taskId') taskId: string): Promise<string | null> {
+      const projectid = await this.taskService.getProjectNameByTaskId(Number(taskId));
+      return projectid;
+  }
+
   @Post('newtask/:id')
   createTask(
     @Param('id') projectid: string,

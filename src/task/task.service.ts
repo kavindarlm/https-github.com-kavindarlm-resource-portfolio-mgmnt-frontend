@@ -13,6 +13,18 @@ export class TaskService {
         @InjectRepository(Project) private projectRepository: Repository<Project>
     ){}
 
+    //Service for finding project name by task ID
+    async getProjectNameByTaskId(taskId: number): Promise<string | null> {
+        const task = await this.taskRepository.findOne({
+            where: { taskid: taskId },
+            relations: ['project']
+        });
+        if (task && task.project) {
+            return task.project.projectName;
+        }
+        return null;
+    }
+
 
     //service for creating task
     async createTask(prjectid: number, createTaskDetails:createTaskDto){

@@ -18,7 +18,15 @@ export class SprintService {
     return this.sprintRepository.find();
   }
 
-  
+  async findOneById(sprint_id: number): Promise<Sprint | null> {
+    return this.sprintRepository.findOne({
+      where: {
+        sprint_id: sprint_id, // Use the correct property name from the entity
+      }
+    });
+  }
+
+
 
   async create(createSprintDto: CreateSprintDto): Promise<Sprint> {
     // Create a new Sprint instance using the DTO
