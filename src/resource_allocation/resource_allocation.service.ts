@@ -76,6 +76,18 @@ export class ResourceAllocationService {
     // Return the list of resource allocation records
     return resourceAllocations;
   }
+
+  // Method to delete a resource allocation row by its ID
+  async deleteResourceAllocationById(id: number): Promise<void> {
+    try {
+      // Attempt to delete the resource allocation row by its ID
+      await this.resourceAllocationRepository.delete(id);
+      console.log(`Resource allocation with ID ${id} deleted successfully.`);
+    } catch (error) {
+      console.error(`Error deleting resource allocation with ID ${id}:`, error);
+      throw new Error('Unable to delete resource allocation row.');
+    }
+  }
   
 
 

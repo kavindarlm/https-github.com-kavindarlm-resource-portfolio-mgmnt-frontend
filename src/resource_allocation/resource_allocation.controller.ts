@@ -29,4 +29,16 @@ export class ResourceAllocationController {
     return this.resourceAllocationService.getResourceAllocationBySprintId(sprintId);
   }
 
+  @Delete(':id')
+  async deleteResourceAllocation(@Param('id') id: number): Promise<void> {
+    try {
+      // Call the service method to delete resource allocation by ID
+      await this.resourceAllocationService.deleteResourceAllocationById(id);
+      console.log(`Resource allocation with ID ${id} deleted successfully.`);
+    } catch (error) {
+      // Log the error and throw an HTTP exception with appropriate status
+      console.error(`Error deleting resource allocation with ID ${id}:`, error);
+    }
+  }
+
 }
