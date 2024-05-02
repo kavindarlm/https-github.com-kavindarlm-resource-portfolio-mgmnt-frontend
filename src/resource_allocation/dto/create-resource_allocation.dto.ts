@@ -6,22 +6,11 @@ import { Task } from 'src/task/entities/task.entity';
 @Entity({ name: 'resource_allocation' })
 export class CreateResourceAllocationDto {
 
-    @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn()
   id: number;
-
-  @ManyToOne(() => Sprint)
-  @JoinColumn({ name: 'sprint_id' })
-  sprint: Sprint;
-
-  @ManyToOne(() => Resource)
-  @JoinColumn({ name: 'resource_id' })
-  resource: Resource;
-
-  @ManyToOne(() => Task)
-  @JoinColumn({ name: 'task_id' })
-  task: Task;
-  
-  @Column()
+  sprint_id: number;
+  resource_id: string;
+  task_id: number;
   percentage: number;
 
 }

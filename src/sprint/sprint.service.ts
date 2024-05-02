@@ -13,6 +13,8 @@ export class SprintService {
     private sprintRepository: Repository<Sprint>, // Inject the Sprint repository
   ) { }
 
+
+
   async findAll(): Promise<Sprint[]> {
     // Use the repository to find all sprints in the database
     return this.sprintRepository.find();
@@ -26,8 +28,6 @@ export class SprintService {
     });
   }
 
-
-
   async create(createSprintDto: CreateSprintDto): Promise<Sprint> {
     // Create a new Sprint instance using the DTO
     const sprint = this.sprintRepository.create(createSprintDto);
@@ -38,5 +38,15 @@ export class SprintService {
     // Save the sprint to the database
     return this.sprintRepository.save(sprint);
   }
+  
+   // Method to find a sprint by its name
+   async findOneByName(sprintName: string): Promise<Sprint | null> {
+    return this.sprintRepository.findOne({
+        where: {
+            sprint_name: sprintName,
+        },
+    });
+}
+
 
 }
