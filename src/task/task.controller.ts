@@ -18,11 +18,11 @@ export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
   @Get(':taskId')
-  async getProjectIdByTaskId(@Param('taskId') taskId: string): Promise<string | null> {
-      const projectid = await this.taskService.getProjectNameByTaskId(Number(taskId));
-      return projectid;
+  async getProjectIdByTaskId(@Param('taskId') taskId: string): Promise<{ projectName: string, projectId: number } | null> {
+      const projectInfo = await this.taskService.getProjectNameAndIdByTaskId(Number(taskId));
+      return projectInfo;
   }
-
+  
   @Post('newtask/:id')
   createTask(
     @Param('id') projectid: string,

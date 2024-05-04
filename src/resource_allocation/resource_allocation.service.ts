@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { ResourceAllocation } from './entities/resource_allocation.entity';
@@ -7,6 +7,7 @@ import { CreateResourceAllocationDto } from './dto/create-resource_allocation.dt
 import { UpdateResourceAllocationDto } from './dto/update-resource_allocation.dto';
 import { Sprint } from 'src/sprint/entities/sprint.entity';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class ResourceAllocationService {
@@ -53,18 +54,20 @@ export class ResourceAllocationService {
   }
 
 
-  async getTasksByResourceId(resourceId: string): Promise<Task[]> {
+  async getTasksByResourceId(resourceId: string): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
+    // Fetching resource allocations with related task data based on the provided resourceId
     const resourceAllocations = await this.resourceAllocationRepository.find({
-      where: { resource: { resourceId: resourceId } },
-      relations: ['task'],
+        where: { resource: { resourceId: resourceId } },
+        relations: ['task'], // Ensure task is included in the fetched data
     });
 
-    if (!resourceAllocations || resourceAllocations.length === 0) {
-      return [];
-    }
+    // Return an array of objects containing both task and resource allocation details
+    return resourceAllocations.map(resourceAllocation => ({
+        task: resourceAllocation.task, // task details
+        resourceAllocation: resourceAllocation, // resource allocation details
+    }));
+}
 
-    return resourceAllocations.map(resourceAllocation => resourceAllocation.task);
-  }
 
   async getResourceAllocationBySprintId(sprintId: number): Promise<ResourceAllocation[]> {
     // Query the repository to find all resource allocation records with the given sprint_id
@@ -72,7 +75,7 @@ export class ResourceAllocationService {
       where: { sprint: { sprint_id: sprintId } },
       relations: ['sprint', 'resource', 'task'],
     });
-  
+
     // Return the list of resource allocation records
     return resourceAllocations;
   }
@@ -88,7 +91,35 @@ export class ResourceAllocationService {
       throw new Error('Unable to delete resource allocation row.');
     }
   }
-  
+
+  async updateResourceAllocation(id: number, updateResourceAllocationDto: UpdateResourceAllocationDto): Promise<ResourceAllocation> {
+    try {
+        // Find the existing resource allocation by its ID
+        const resourceAllocation = await this.resourceAllocationRepository.findOne({ where: { id } });
+
+        // If the resource allocation is not found, throw an error
+        if (!resourceAllocation) {
+            throw new NotFoundException(`Resource allocation with ID ${id} not found`);
+        }
+
+        // Update the percentage field if it is provided in the DTO
+        if (updateResourceAllocationDto.percentage !== undefined) {
+            resourceAllocation.percentage = updateResourceAllocationDto.percentage;
+        }
+
+        // Save the updated resource allocation to the database
+        await this.resourceAllocationRepository.save(resourceAllocation);
+
+        // Return the updated resource allocation
+        return resourceAllocation;
+    } catch (error) {
+        console.error(`Error updating resource allocation with ID ${id}:`, error);
+        // Handle any other error types as needed
+        throw new HttpException('Failed to update resource allocation', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
+
 
 
 }
