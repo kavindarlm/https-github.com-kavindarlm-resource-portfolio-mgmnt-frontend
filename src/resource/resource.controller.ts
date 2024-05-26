@@ -25,6 +25,11 @@ export class ResourceController {
     async getResourcesByTeamId(@Param('teamId') teamId: number) {
       return this.resourceService.getResourcesByTeamId(teamId);
     }
+
+    @Get('holiday/:resourceId')
+    getResourceById(@Param('resourceId') resourceId: string): Promise<Resource> {
+      return this.resourceService.getResourceById(resourceId);
+    }
   
   @Get()
   getResources() {
@@ -50,6 +55,8 @@ export class ResourceController {
   async deleteResourceById(@Param('resourceId') resourceId: string) {
     await this.resourceService.deleteResource(resourceId);
   }
+
+  
 
 
 

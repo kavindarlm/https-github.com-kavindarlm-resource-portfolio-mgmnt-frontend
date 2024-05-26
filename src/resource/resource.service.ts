@@ -100,14 +100,14 @@ async getResourcesByTeamId(teamId: number): Promise<{resourceId: string, roleNam
   }));
 }
 
-// // In your ResourceService
-// async getResourceById(id: number): Promise<Resource> {
-//   const resource = await this.resourceRepository.findOne({ where: { resource } });
-//   if (!resource) {
-//     throw new NotFoundException(`Resource with id ${id} not found`);
-//   }
-//   return resource;
-// }
+// In your ResourceService
+async getResourceById(resourceId: string): Promise<Resource> {
+  const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+  if (!resource) {
+    throw new NotFoundException(`Resource with id ${resourceId} not found`);
+  }
+  return resource;
+}
 
 
 

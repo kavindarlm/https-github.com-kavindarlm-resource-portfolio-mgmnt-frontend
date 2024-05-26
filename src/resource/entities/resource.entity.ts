@@ -29,7 +29,6 @@ export class Resource {
     @JoinColumn({ name: 'teamId' })
     team: Team;
 
-
     @ManyToOne(() => OrgUnit, orgUnit => orgUnit.resources)
     @JoinColumn({ name: 'unitId' })
     orgUnit: OrgUnit;
@@ -37,6 +36,10 @@ export class Resource {
     @ManyToOne(() => JobRole, jobRole => jobRole.resources)
     @JoinColumn({ name: 'roleId' })
     jobRole: JobRole;
+
+    @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.resource)
+    resourceHolidays: ResourceHoliday[];
+
 
 
 }
