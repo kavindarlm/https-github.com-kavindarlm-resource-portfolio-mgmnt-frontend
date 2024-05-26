@@ -28,8 +28,6 @@ export class TaskService {
         return null;
     }
 
-
-
     //service for creating task
     async createTask(prjectid: number, createTaskDetails: createTaskDto) {
         try {

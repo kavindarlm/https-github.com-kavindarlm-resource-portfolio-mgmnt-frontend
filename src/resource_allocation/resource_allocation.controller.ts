@@ -63,5 +63,12 @@ export class ResourceAllocationController {
     }
   }
 
+  @Patch(':id/task/:taskId')
+  async updateResourceAllocationTaskId(
+    @Param('id') id: number,
+    @Param('taskId') taskId: number
+  ): Promise<ResourceAllocation> {
+    return this.resourceAllocationService.updateTaskId(id, taskId);
+  }
 
 }

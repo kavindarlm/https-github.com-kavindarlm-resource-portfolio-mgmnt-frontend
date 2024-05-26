@@ -57,16 +57,16 @@ export class ResourceAllocationService {
   async getTasksByResourceId(resourceId: string): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
     // Fetching resource allocations with related task data based on the provided resourceId
     const resourceAllocations = await this.resourceAllocationRepository.find({
-        where: { resource: { resourceId: resourceId } },
-        relations: ['task'], // Ensure task is included in the fetched data
+      where: { resource: { resourceId: resourceId } },
+      relations: ['task'], // Ensure task is included in the fetched data
     });
 
     // Return an array of objects containing both task and resource allocation details
     return resourceAllocations.map(resourceAllocation => ({
-        task: resourceAllocation.task, // task details
-        resourceAllocation: resourceAllocation, // resource allocation details
+      task: resourceAllocation.task, // task details
+      resourceAllocation: resourceAllocation, // resource allocation details
     }));
-}
+  }
 
 
   async getResourceAllocationBySprintId(sprintId: number): Promise<ResourceAllocation[]> {
@@ -94,31 +94,58 @@ export class ResourceAllocationService {
 
   async updateResourceAllocation(id: number, updateResourceAllocationDto: UpdateResourceAllocationDto): Promise<ResourceAllocation> {
     try {
-        // Find the existing resource allocation by its ID
-        const resourceAllocation = await this.resourceAllocationRepository.findOne({ where: { id } });
+      // Find the existing resource allocation by its ID
+      const resourceAllocation = await this.resourceAllocationRepository.findOne({ where: { id } });
 
-        // If the resource allocation is not found, throw an error
-        if (!resourceAllocation) {
-            throw new NotFoundException(`Resource allocation with ID ${id} not found`);
-        }
+      // If the resource allocation is not found, throw an error
+      if (!resourceAllocation) {
+        throw new NotFoundException(`Resource allocation with ID ${id} not found`);
+      }
 
-        // Update the percentage field if it is provided in the DTO
-        if (updateResourceAllocationDto.percentage !== undefined) {
-            resourceAllocation.percentage = updateResourceAllocationDto.percentage;
-        }
+      // Update the percentage field if it is provided in the DTO
+      if (updateResourceAllocationDto.percentage !== undefined) {
+        resourceAllocation.percentage = updateResourceAllocationDto.percentage;
+      }
 
-        // Save the updated resource allocation to the database
-        await this.resourceAllocationRepository.save(resourceAllocation);
+      // Save the updated resource allocation to the database
+      await this.resourceAllocationRepository.save(resourceAllocation);
 
-        // Return the updated resource allocation
-        return resourceAllocation;
+      // Return the updated resource allocation
+      return resourceAllocation;
     } catch (error) {
-        console.error(`Error updating resource allocation with ID ${id}:`, error);
-        // Handle any other error types as needed
-        throw new HttpException('Failed to update resource allocation', HttpStatus.INTERNAL_SERVER_ERROR);
+      console.error(`Error updating resource allocation with ID ${id}:`, error);
+      // Handle any other error types as needed
+      throw new HttpException('Failed to update resource allocation', HttpStatus.INTERNAL_SERVER_ERROR);
     }
-}
+  }
 
+  async updateTaskId(id: number, taskId: number): Promise<ResourceAllocation> {
+    // Find the existing resource allocation by its ID
+    const resourceAllocation = await this.resourceAllocationRepository.findOne({
+      where: { id },
+      relations: ['task'],
+    });
+
+    // If the resource allocation is not found, throw an error
+    if (!resourceAllocation) {
+      throw new NotFoundException(`Resource allocation with ID ${id} not found`);
+    }
+
+    // Find the new task based on the provided task ID
+    const newTask = await this.taskRepository.findOne({ where: { taskid: taskId } });
+    if (!newTask) {
+      throw new NotFoundException(`Task with ID ${taskId} not found`);
+    }
+
+    // Update the task relationship
+    resourceAllocation.task = newTask;
+
+    // Save the updated resource allocation to the database
+    await this.resourceAllocationRepository.save(resourceAllocation);
+
+    // Return the updated resource allocation
+    return resourceAllocation;
+  }
 
 
 
