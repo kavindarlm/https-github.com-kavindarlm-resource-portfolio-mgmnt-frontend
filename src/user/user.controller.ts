@@ -90,6 +90,9 @@ export class UserController {
     response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
+      user_id: user.user_id,
+      token : jwt,
+      user_role: user.user_role,
       message: 'Login success'
     }
   }
@@ -105,7 +108,7 @@ export class UserController {
         throw new UnauthorizedException('Unauthorized');
       }
 
-      const user = await this.userService.findLoginUser({ where: { id: data['id'] } });
+      const user = await this.userService.findLoginUser({ where: { user_id: data['id'] } });
       const { password, ...result } = user;
 
       return result;
@@ -131,6 +134,18 @@ export class UserController {
   @Get('findAll')
   findAll() {
     return this.userService.findAll();
+  }
+
+  //find all users
+  @Get('findAllUsers')
+  findAllUsers() {
+    return this.userService.findAllUsers();
+  }
+
+  //find all admins
+  @Get('findAllAdmins')
+  findAllAdmins() {
+    return this.userService.findAllAdmins();
   }
 
 

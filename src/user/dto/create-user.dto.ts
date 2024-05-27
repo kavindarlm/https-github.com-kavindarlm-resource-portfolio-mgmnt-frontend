@@ -10,6 +10,9 @@ export class CreateUserDto {
     @IsEmail()
     user_email: string;
 
+    @IsNotEmpty({message: 'User role is required'})
+    user_role: string;
+
     password?: string;
 
 }

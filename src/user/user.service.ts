@@ -25,6 +25,16 @@ export class UserService {
     return allusers;
   }
 
+  async findAllUsers() {
+    const users = await this.userRepo.find({ where: { user_role: 'user' } });
+    return users;
+  }
+  
+  async findAllAdmins() {
+    const admins = await this.userRepo.find({ where: { user_role: 'admin' } });
+    return admins;
+  }
+
 
   async findLoginUser(condition: any): Promise<User> {
     return await this.userRepo.findOne(condition);
