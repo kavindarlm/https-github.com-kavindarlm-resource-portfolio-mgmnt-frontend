@@ -12,6 +12,18 @@ export class ResourceController {
         return this.resourceService.findResources();
   }
 
+  @Get('/ForSprint')
+  async findMany() {
+    const resources = await this.resourceService.findMany();
+    return resources.map(resource => ({
+      resource_id: resource.resourceId,
+      resource_name: resource.resourceName,
+      team_name: resource.teams? resource.teams.team_Name : null,
+      role_name: resource.job_role? resource.job_role.roleName : null,
+      org_unit_name: resource.org_unit? resource.org_unit.unitName : null,
+    }));
+  }
+
   @Get(':resourceId')
   async findOneResource(@Param('resourceId') resourceId: string) {
     return this.resourceService.findOneResource(resourceId);

@@ -16,6 +16,9 @@ export class User {
     @Column({})
     password: string;
 
+    @Column({})
+    user_role: string;
+
     @CreateDateColumn({ type: 'timestamp' })
     createdTime: Date;
 

@@ -16,11 +16,12 @@ import { TeamModule } from './team/team.module';
 import { ResourceHolidayModule } from './resource_holiday/resource_holiday.module';
 import { HolidayModule } from './holiday/holiday.module';
 import { CriticalityModule } from './criticality/criticality.module';
-
+import { SprintModule } from './sprint/sprint.module';
+import { ResourceAllocationModule } from './resource_allocation/resource_allocation.module';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, FunctionsModule, UsersFunctionModule, ProjectModule, TaskModule, ResourceModule, JobRoleModule, OrgUnitModule, TeamModule, ResourceHolidayModule, HolidayModule, CriticalityModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, FunctionsModule, UsersFunctionModule, ProjectModule, TaskModule, ResourceModule, JobRoleModule, OrgUnitModule, TeamModule, ResourceHolidayModule, HolidayModule, CriticalityModule,SprintModule, ResourceAllocationModule],
   controllers: [AppController],
   providers: [AppService],
 })
