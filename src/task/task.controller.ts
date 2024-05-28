@@ -7,6 +7,8 @@ import {
   Param,
   Post,
   Put,
+  ParseIntPipe,
+  BadRequestException,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { createTaskDto } from './dto/createTask.dto';
@@ -24,11 +26,22 @@ export class TaskController {
   }
   
   @Post('newtask/:id')
-  createTask(
-    @Param('id') projectid: string,
+  async createTask(
+    @Param('id') projectId: string,
     @Body() createTaskDto: createTaskDto,
   ) {
-    return this.taskService.createTask(parseInt(projectid, 10), createTaskDto);
+    try {
+      const task = await this.taskService.createTask(parseInt(projectId, 10), createTaskDto);
+      return { success: true, data: task };
+    } catch (error) {
+      if (error instanceof BadRequestException) {
+        // Handle validation errors
+        return { success: false, message: error.message };
+      } else {
+        // Handle other types of errors
+        return { success: false, message: 'Failed to create task.' };
+      }
+    }
   }
 
   @Get(':id')
@@ -44,7 +57,7 @@ export class TaskController {
     await this.taskService.updateTask(taskid.toString(), updateTaskDto);
   }
 
-  @Delete(':id')
+  @Delete('deletetask/:id')
   async DeleteTask(@Param('id') taskid: number) {
     await this.taskService.deleteTask(taskid.toString());
   }
@@ -61,4 +74,16 @@ export class TaskController {
   ){
     await this.taskService.updateTaskDetails(taskId, updateTaskDto);
   }
-} 
+
+  @Get('sum-allocation/:id')
+  async getSumAllocationPercentageByProjectId(@Param('id', ParseIntPipe) projectId: number): Promise<number> {
+      const sum = await this.taskService.getSumOfAllocationPercentageByProjectId(projectId);
+      return sum;
+  }
+
+  @Get('project-progress/:id')
+  async getProjectProgress(@Param('id', ParseIntPipe) projectId: number): Promise<number> {
+      const progress = await this.taskService.getProjectProgressByProjectId(projectId);
+      return progress;
+  }
+}
