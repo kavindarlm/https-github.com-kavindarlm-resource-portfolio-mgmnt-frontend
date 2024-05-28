@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Resource } from "src/resource/entities/resource.entity";
+import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'org_unit' })
 export class OrgUnit {
@@ -17,5 +18,8 @@ export class OrgUnit {
 
     @Column()
     createdAt: Date;
+
+    @OneToMany(() => Resource, resource => resource.orgUnit)
+    resources: Resource[];
 
 }

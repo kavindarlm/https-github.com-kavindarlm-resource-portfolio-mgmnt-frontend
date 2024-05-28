@@ -1,18 +1,20 @@
 export class CreateTeamDto {
-        team_Name: string;
-        team_description: string;
-        
-        
+    teamName: string;
+    team_description: string;
+    resourceIds: string[] = [];
+    
+    
 }
 
 export type CreateTeamParams = {
-    team_Name: string;
-    team_description: string;
-   
+teamName: string;
+team_description: string;
+resourceIds: string[];
+
 };
 
 export type UpdateTeamParams = {
-    team_Name: string;
-    team_description: string; 
-    
+team_Name: string;
+team_description: string; 
+
 };

@@ -1,7 +1,8 @@
-import { Column, Entity, PrimaryColumn, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from "typeorm";
 import { JobRole } from "src/job_role/entities/job_role.entity";
-import { Team } from "src/team/entities/team.entity";
 import { OrgUnit } from "src/org_unit/entities/org_unit.entity";
+import { ResourceHoliday } from "src/resource_holiday/entities/resource_holiday.entity";
+import { Team } from "src/team/entities/team.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Resource {
@@ -12,21 +13,31 @@ export class Resource {
     @Column()
     resourceName: string;
 
+    @Column()
+    roleId: number;
 
-    @ManyToOne(() => Team)
-    @JoinColumn({ name: 'team_id' })
-    teams: Team;
+    @Column()
+    unitId: number;
 
-
-    @ManyToOne(() => JobRole)
-    @JoinColumn({ name: 'roleId' })
-    job_role: JobRole;
-
-
-    @ManyToOne(() => OrgUnit)
-    @JoinColumn({ name: 'unitId' })
-    org_unit: OrgUnit;
+    @Column({ nullable: true })
+    teamId: number;
 
     @Column()
     createdAt: Date;
+
+    @ManyToOne(() => Team, team => team.resources)
+    @JoinColumn({ name: 'teamId' })
+    team: Team;
+
+    @ManyToOne(() => OrgUnit, orgUnit => orgUnit.resources)
+    @JoinColumn({ name: 'unitId' })
+    orgUnit: OrgUnit;
+
+    @ManyToOne(() => JobRole, jobRole => jobRole.resources)
+    @JoinColumn({ name: 'roleId' })
+    jobRole: JobRole;
+
+    @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.resource)
+    resourceHolidays: ResourceHoliday[];
+
 }

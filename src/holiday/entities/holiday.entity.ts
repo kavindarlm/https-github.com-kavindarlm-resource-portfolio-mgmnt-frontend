@@ -1,6 +1,7 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { ResourceHoliday } from "src/resource_holiday/entities/resource_holiday.entity";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity({ name: 'holiday' })
+@Entity()
 export class Holiday {
     @PrimaryGeneratedColumn()
     holy_id: number;
@@ -11,6 +12,9 @@ export class Holiday {
     @Column()
     holy_type: string;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;
+
+    @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.holiday)
+    resourceHolidays: ResourceHoliday[];
 }
