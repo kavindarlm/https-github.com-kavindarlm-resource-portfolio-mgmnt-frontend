@@ -1,4 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateHolidayDto } from './create-holiday.dto';
-
-export class UpdateHolidayDto extends PartialType(CreateHolidayDto) {}
+export class UpdateHolidayDto {
+    readonly date: string;
+    readonly holy_type: string;
+  }

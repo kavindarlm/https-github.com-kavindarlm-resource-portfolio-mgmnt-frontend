@@ -1,52 +1,46 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe, NotFoundException } from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
 import { UpdateTeamDto } from './dto/update-team.dto';
+import { Team } from './entities/team.entity';
 
 @Controller('teams')
 export class TeamController {
-      //inject team service
-constructor(private teamService: TeamService){
+  constructor(private teamService: TeamService) { }
 
-}
+  //get all teams
+  @Get()
+  async getTeams() {
+    return this.teamService.findTeams();
 
-//create route
-//get request to get teams
-@Get()
-async getTeams(){
-   return this.teamService.findTeams();    
-}
-
-//post request to create teams
-@Post()
-createUser(@Body() createTeamDto: CreateTeamDto){
-   return this.teamService.createTeam(createTeamDto);
-}
-//use retrun - when make a post request it with display the details
-
-
-//update data in the database
-//put used to update entire record
-//patch used to update only a portion of the record
-@Put(':id')
-async updateTeamById(@Param('id',ParseIntPipe) id:number,
-               @Body() updateTeamDto: UpdateTeamDto,
-               ){
-    //parseintpipe - use to give an error if the route paramter in not a number
-    //validate route parameter
-   await this.teamService.updateTeam(id,updateTeamDto);
-
-}
-
-
-@Delete(':id')
-async deleteTeamById(@Param('id') id: number) {
-  return this.teamService.deleteTeamById(id);
-}
-
-
-@Get(':id')
-  async getTeamById(@Param('id') id: number) {
-    return this.teamService.getTeamById(id);
   }
+
+  //create a team by updating teamid column in resource table
+  @Post()
+  async createTeamAndAssignResources(@Body() formData: CreateTeamDto): Promise<Team> {
+    return this.teamService.createTeamAndAssignResources(formData);
+  }
+
+  //get team data by it's id
+  @Get(':id')
+  async getTeamById(@Param('id') id: number): Promise<Team> {
+    const team = await this.teamService.getTeamById(id);
+    if (!team) {
+      throw new NotFoundException(`Team with ID ${id} not found`);
+    }
+    return team;
+  }
+
+  //update teams
+  @Put(':id')
+  async updateTeam(@Param('id') id: string, @Body() updatedTeam: Partial<Team>): Promise<Team> {
+    return this.teamService.updateTeam(id, updatedTeam);
+  }
+
+  //delete team
+  @Delete(':id')
+  deleteTeam(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.teamService.deleteTeamById(id);
+}
+
 }
