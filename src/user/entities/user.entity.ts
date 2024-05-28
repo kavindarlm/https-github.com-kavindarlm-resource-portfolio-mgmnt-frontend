@@ -1,21 +1,27 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
-import { Post } from '../../post/entities/post.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
+import { UsersFunction } from 'src/users_function/entities/users_function.entity';
 
 
 @Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
-    id: number;
+    user_id: number;
 
     @Column({nullable: false, default: 'New User'})
-    name: string;
+    user_name: string;
 
     @Column({})
-    email: string;
+    user_email: string;
 
     @Column({})
     password: string;
 
-    @OneToMany(()=>Post, (post)=>post.user)
-    posts: Post[];
+    @Column({})
+    user_role: string;
+
+    @CreateDateColumn({ type: 'timestamp' })
+    createdTime: Date;
+
+    @OneToMany(() => UsersFunction, usersFunction => usersFunction.user)
+    usersFunctions: UsersFunction[];
 }
