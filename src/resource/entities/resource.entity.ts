@@ -40,6 +40,4 @@ export class Resource {
     @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.resource)
     resourceHolidays: ResourceHoliday[];
 
-
-
 }

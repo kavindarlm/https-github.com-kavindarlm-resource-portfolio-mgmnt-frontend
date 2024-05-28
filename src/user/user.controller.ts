@@ -9,6 +9,7 @@ import { Response, Request } from 'express';
 import { Req } from '@nestjs/common';
 import { UsersFunctionService } from '../users_function/users_function.service';
 import * as nodemailer from 'nodemailer';
+import { NotFoundException } from '@nestjs/common';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -28,7 +29,7 @@ const transporter = nodemailer.createTransport({
 
 @Controller('api')
 export class UserController {
-  constructor(private userService: UserService, private jwtService: JwtService,private readonly usersFunctionService: UsersFunctionService) { }
+  constructor(private userService: UserService, private jwtService: JwtService, private readonly usersFunctionService: UsersFunctionService) { }
 
   @Post('register')
   @UsePipes(ValidationPipe)
@@ -53,8 +54,8 @@ export class UserController {
        <h3 style="color: blue;">Your password :</h3>
        <h3><b style="color: red;">${password}</b></h3>`,
     };
-  
-    transporter.sendMail(mailOptions, function(error, info){
+
+    transporter.sendMail(mailOptions, function (error, info) {
       if (error) {
         console.log(error);
       } else {
@@ -90,6 +91,10 @@ export class UserController {
     response.cookie('jwt', jwt, { httpOnly: true });
 
     return {
+      user_id: user.user_id,
+      token: jwt,
+      user_role: user.user_role,
+      user_name: user.user_name,
       message: 'Login success'
     }
   }
@@ -105,7 +110,7 @@ export class UserController {
         throw new UnauthorizedException('Unauthorized');
       }
 
-      const user = await this.userService.findLoginUser({ where: { id: data['id'] } });
+      const user = await this.userService.findLoginUser({ where: { user_id: data['id'] } });
       const { password, ...result } = user;
 
       return result;
@@ -133,6 +138,18 @@ export class UserController {
     return this.userService.findAll();
   }
 
+  //find all users
+  @Get('findAllUsers')
+  findAllUsers() {
+    return this.userService.findAllUsers();
+  }
+
+  //find all admins
+  @Get('findAllAdmins')
+  findAllAdmins() {
+    return this.userService.findAllAdmins();
+  }
+
 
   //find single user by id
   @Get('find/:id')
@@ -140,11 +157,45 @@ export class UserController {
     return this.userService.findUserById(id);
   }
 
-
   //update user by id
   @Patch(':id')
-  updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
-    return this.userService.updateUserById(id, updateUser);
+  async updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
+    const user = await this.userService.findUserById(id);
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    // Update the email if it's different from the current one
+    if (updateUser.user_email && updateUser.user_email !== user.user_email) {
+
+      const tempPassword = Math.random().toString(36).slice(-8);
+      const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+      const mailOptions = {
+        from: 'malinthakavinda24@gmail.com',
+        to: updateUser.user_email,
+        subject: 'Tapro Project & Resource management system',
+        html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
+       <h3 style="color: blue;">Your temporary password :</h3>
+       <h3><b style="color: red;">${tempPassword}</b></h3>`,
+      };
+      // Send the email
+      transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+          console.log(error);
+        } else {
+          console.log('Email sent: ' + info.response);
+        }
+      });
+      user.user_email = updateUser.user_email;
+      user.password = hashedPassword;
+    }
+    // Update the name if it's different from the current one
+    if (updateUser.user_name && updateUser.user_name !== user.user_name) {
+      user.user_name = updateUser.user_name;
+    }
+
+    return this.userService.updateUserById(id, user);
   }
 
   //delete user by id
@@ -156,12 +207,52 @@ export class UserController {
 
   //  controller for searching users by user name
   @Get('searchUserName/search')
-  async searchUsers(@Req() req: Request){
+  async searchUsers(@Req() req: Request) {
     const builder = await this.userService.searchUser('user_name');;
 
-    if(req.query.s){
-      builder.where('user_name.user_name like :s', {s: `%${req.query.s}%`});
+    if (req.query.s) {
+      builder.where('user_name.user_name like :s', { s: `%${req.query.s}%` });
     }
-    return builder.getMany(); 
+    return builder.getMany();
   }
+
+  //update password
+  @Post('resetPassword')
+  async updatePassword(@Body('user_id') user_id: number, @Body('currentPassword') currentPassword: string, @Body('newPassword') newPassword: string) {
+    return this.userService.updatePassword(user_id, currentPassword, newPassword);
+  }
+
+  //forgot password
+  @Post('forgotPassword')
+  async forgotPassword(@Body('user_email') user_email: string) {
+    const user = await this.userService.findLoginUser({ where: { user_email: user_email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const tempPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await bcrypt.hash(tempPassword, 12);
+
+    const mailOptions = {
+      from: 'malinthakavinda24@gmail.com',
+      to: user_email,
+      subject: 'Tapro Project & Resource management system',
+      html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
+       <h3 style="color: blue;">Your New temporary password :</h3>
+       <h3><b style="color: red;">${tempPassword}</b></h3>`,
+    };
+    // Send the email
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+      }
+    });
+
+    user.password = hashedPassword;
+    return this.userService.updateUserById(user.user_id, user);
+  }
+
 }
