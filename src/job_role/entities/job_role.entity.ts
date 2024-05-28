@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryColumn } from "typeorm";
+import { Resource } from "src/resource/entities/resource.entity";
+import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity({name: 'job_role'})
 export class JobRole {
@@ -8,4 +9,7 @@ export class JobRole {
 
     @Column()
     roleName: string;
+
+    @OneToMany(() => Resource, resource => resource.job_role)
+    resources: Resource[];
 }
