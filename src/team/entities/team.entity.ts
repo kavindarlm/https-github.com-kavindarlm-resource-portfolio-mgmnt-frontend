@@ -1,9 +1,10 @@
-import { Column, Entity,  PrimaryGeneratedColumn } from "typeorm";
+import { Resource } from "src/resource/entities/resource.entity";
+import { Column, CreateDateColumn, Entity,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'teams' })
 export class Team {
     @PrimaryGeneratedColumn()
-    team_id: number;
+    teamId: number;
   
     @Column()
     team_Name: string;
@@ -11,6 +12,9 @@ export class Team {
     @Column()
     team_description:string;
 
-    @Column()
+    @CreateDateColumn()
     createdAt: Date;    
+
+    @OneToMany(() => Resource, resource => resource.team)
+    resources: Resource[];
 }
