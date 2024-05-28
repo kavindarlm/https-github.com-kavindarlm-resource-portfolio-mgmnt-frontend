@@ -25,15 +25,15 @@ export class Resource {
     @Column()
     createdAt: Date;
 
-    @ManyToOne(() => Team, team => team.resources)
+    @ManyToOne(() => Team, teams => teams.resources)
     @JoinColumn({ name: 'teamId' })
     teams: Team;
 
-    @ManyToOne(() => OrgUnit, orgUnit => orgUnit.resources)
+    @ManyToOne(() => OrgUnit, org_unit => org_unit.resources)
     @JoinColumn({ name: 'unitId' })
     org_unit: OrgUnit;
 
-    @ManyToOne(() => JobRole, jobRole => jobRole.resources)
+    @ManyToOne(() => JobRole, job_role => job_role.resources)
     @JoinColumn({ name: 'roleId' })
     job_role: JobRole;
 
