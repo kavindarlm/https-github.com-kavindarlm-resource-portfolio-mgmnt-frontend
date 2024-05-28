@@ -10,6 +10,6 @@ export class JobRole {
     @Column()
     roleName: string;
 
-    @OneToMany(() => Resource, resource => resource.jobRole)
+    @OneToMany(() => Resource, resource => resource.job_role)
     resources: Resource[];
 }

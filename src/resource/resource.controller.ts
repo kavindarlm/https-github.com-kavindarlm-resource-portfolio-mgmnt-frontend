@@ -42,9 +42,9 @@ export class ResourceController {
     return resources.map(resource => ({
       resource_id: resource.resourceId,
       resource_name: resource.resourceName,
-      team_name: resource.team? resource.team.team_Name : null,
-      role_name: resource.jobRole? resource.jobRole.roleName : null,
-      org_unit_name: resource.orgUnit? resource.orgUnit.unitName : null,
+      team_name: resource.teams? resource.teams.team_Name : null,
+      role_name: resource.job_role? resource.job_role.roleName : null,
+      org_unit_name: resource.org_unit? resource.org_unit.unitName : null,
     }));
   }
 
