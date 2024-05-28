@@ -15,6 +15,6 @@ export class Team {
     @CreateDateColumn()
     createdAt: Date;    
 
-    @OneToMany(() => Resource, resource => resource.team)
+    @OneToMany(() => Resource, resource => resource.teams)
     resources: Resource[];
 }

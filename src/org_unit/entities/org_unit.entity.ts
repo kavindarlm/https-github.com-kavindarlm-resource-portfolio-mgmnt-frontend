@@ -19,7 +19,7 @@ export class OrgUnit {
     @Column()
     createdAt: Date;
 
-    @OneToMany(() => Resource, resource => resource.orgUnit)
+    @OneToMany(() => Resource, resource => resource.org_unit)
     resources: Resource[];
 
 }

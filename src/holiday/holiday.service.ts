@@ -129,13 +129,13 @@ async deleteHoliday(holy_id: string): Promise<void> {
   // used to fill resorce table data to backend
   async findAll(): Promise<{resourceId: string, roleName: string, unitName: string }[]> {
     const resources = await this.resourcesRepository.find({ 
-      relations: ['jobRole', 'orgUnit'] 
+      relations: ['job_role', 'org_unit'] 
     });
   
     return resources.map(resource => ({
       resourceId: resource.resourceId,  // Use resource.id instead of resource.resourceName
-      roleName: resource.jobRole.roleName,
-      unitName: resource.orgUnit.unitName
+      roleName: resource.job_role.roleName,
+      unitName: resource.org_unit.unitName
     }));
   }
 
