@@ -60,12 +60,12 @@ export class ResourceService {
   async getResourcesByTeamIdNull(): Promise<{resourceId: string, roleName: string, unitName: string }[]> {
     const resources = await this.resourceRepository.find({ 
         where: { teamId: IsNull() },
-        relations: ['jobRole', 'orgUnit'] 
+        relations: ['job_role', 'org_unit'] 
     });
     return resources.map(resource => ({
         resourceId: resource.resourceId,
-        roleName: resource.jobRole.roleName,
-        unitName: resource.orgUnit.unitName
+        roleName: resource.job_role.roleName,
+        unitName: resource.org_unit.unitName
     }));
   }
   
@@ -78,7 +78,7 @@ export class ResourceService {
             { teamId: teamId },
             { teamId: IsNull() }
         ],
-        relations: ['jobRole', 'orgUnit'] 
+        relations: ['job_role', 'org_unit'] 
     });
 
     // Sort resources so that resources with the same teamId come first
@@ -86,8 +86,8 @@ export class ResourceService {
 
     return resources.map(resource => ({
         resourceId: resource.resourceId,
-        roleName: resource.jobRole.roleName,
-        unitName: resource.orgUnit.unitName,
+        roleName: resource.job_role.roleName,
+        unitName: resource.org_unit.unitName,
     }));
 }
 
@@ -96,13 +96,13 @@ async getResourcesByTeamId(teamId: number): Promise<{resourceId: string, roleNam
   // Fetch resources where teamId is the provided teamId
   const resources = await this.resourceRepository.find({ 
       where: { teamId: teamId },
-      relations: ['jobRole', 'orgUnit'] 
+      relations: ['job_role', 'org_unit'] 
   });
 
   return resources.map(resource => ({
       resourceId: resource.resourceId,
-      roleName: resource.jobRole.roleName,
-      unitName: resource.orgUnit.unitName,
+      roleName: resource.job_role.roleName,
+      unitName: resource.org_unit.unitName,
       teamId: resource.teamId, // Add this line
   }));
 }

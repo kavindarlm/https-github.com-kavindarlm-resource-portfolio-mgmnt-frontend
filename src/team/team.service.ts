@@ -62,8 +62,8 @@ export class TeamService {
     if (team) {
       team.resources = team.resources.map(resource => ({
         ...resource,
-        roleName: resource.jobRole.roleName,
-        unitName: resource.orgUnit.unitName
+        roleName: resource.job_role.roleName,
+        unitName: resource.org_unit.unitName
       }));
     }
   
