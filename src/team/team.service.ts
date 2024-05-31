@@ -56,7 +56,7 @@ export class TeamService {
   async getTeamById(id: number): Promise<Team> {
     const team = await this.teamRepository.findOne({ 
       where: { teamId: id }, 
-      relations: ['resources', 'resources.orgUnit', 'resources.jobRole'] 
+      relations: ['resources', 'resources.org_unit', 'resources.job_role'] 
     });
   
     if (team) {

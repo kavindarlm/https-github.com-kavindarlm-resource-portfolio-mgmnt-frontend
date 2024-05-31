@@ -4,7 +4,8 @@ export class CreateProjectDto {
     projectStartDate: string;
     projectEndDate: string;
     criticality_id: number;
-    projectManager: string;
-    deliveryManager: string;
+    projectManager_id: string;
+    deliveryManager_id: string;
     projectDescription: string;
 }
+ 

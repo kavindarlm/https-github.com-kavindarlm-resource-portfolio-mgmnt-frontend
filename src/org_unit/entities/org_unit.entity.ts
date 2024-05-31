@@ -1,5 +1,5 @@
 import { Resource } from "src/resource/entities/resource.entity";
-import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, OneToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'org_unit' })
 export class OrgUnit {
@@ -21,5 +21,12 @@ export class OrgUnit {
 
     @OneToMany(() => Resource, resource => resource.org_unit)
     resources: Resource[];
+
+     // Self-referencing relationship
+     @ManyToOne(() => OrgUnit, unit => unit.children)
+     parent: OrgUnit;
+ 
+     @OneToMany(() => OrgUnit, unit => unit.parent)
+     children: OrgUnit[];
 
 }

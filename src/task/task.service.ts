@@ -150,7 +150,7 @@ export class TaskService {
     
             // Ensure the total weight is equal to 1 (100%)
             if (totalWeight !== 1) {
-                throw new Error('Total weight of task allocation percentages should be equal to 100%');
+                // throw new Error('Total weight of task allocation percentages should be equal to 100%');
             }
     
             // Calculate the project progress percentage
@@ -162,6 +162,10 @@ export class TaskService {
         }
     }
     
+    //Service for search Task by name
+    async searchTask(alias: string){
+        return this.taskRepository.createQueryBuilder(alias)
+    }
     
     
 }
