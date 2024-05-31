@@ -7,6 +7,8 @@ import {
   Delete,
   Put,
   Req,
+  NotFoundException,
+  BadRequestException,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -26,10 +28,20 @@ export class ProjectController {
 
   //controller for creating a project
   @Post()
-    createProject(@Body() createProjectDtoo: CreateProjectDto){
-        this.projectService.createProject(createProjectDtoo);
-    }
-
+    async createProject(@Body() createProjectDtoo: CreateProjectDto){
+      try{
+        const project = this.projectService.createProject(createProjectDtoo);
+        return project;
+      }catch(error){
+        if(error instanceof NotFoundException){
+          throw new NotFoundException('Delivery Manager or Project Manager not found');
+        }
+        else{
+          throw new BadRequestException('Could not create the project');
+        }
+      }
+    } 
+ 
   //controller for getting a project by id
   @Get(':id')
   getProjectById(@Param('id') projectid: number): Promise<Project> {
@@ -37,15 +49,16 @@ export class ProjectController {
   }
  
   //controller for updating a project
-  @Put(':id') 
-  async UpdateProject(
-    @Param('id') projectid: number,
+  @Put(':id')
+  async updateProject(
+    @Param('id') id: number,
     @Body() updateProjectDto: UpdateProjectDto,
-  ) {
-    await this.projectService.updateProject(
-      projectid.toString(),
-      updateProjectDto,
-    );
+  ): Promise<Project> {
+    try {
+      return await this.projectService.updateProject(id, updateProjectDto);
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
   }
 
   //controller for deleting a project
@@ -87,6 +100,12 @@ export class ProjectController {
       builder.where('projects.projectName like :s', {s: `%${req.query.s}%`});
     }
     return builder.getMany(); 
+  }
+
+  // controller for return all the resource id and resource name
+  @Get('getResoure/bynameAndId')
+  async getResourceNameAndId(): Promise<{ resourceId: string; resourceName: string }[]> {
+    return this.projectService.getResourceNameAndId();
   }
   
 }

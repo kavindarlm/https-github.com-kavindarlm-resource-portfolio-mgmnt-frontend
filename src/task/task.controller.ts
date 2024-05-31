@@ -9,11 +9,13 @@ import {
   Put,
   ParseIntPipe,
   BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
 import { createTaskDto } from './dto/createTask.dto';
 import { Task } from './entities/task.entity';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
+import { Request } from 'express';
 
 @Controller('task')
 export class TaskController {
@@ -44,7 +46,7 @@ export class TaskController {
     }
   }
 
-  @Get(':id')
+  @Get('getTask/:id')
   getTaskById(@Param('id') taskid: number): Promise<Task> {
     return this.taskService.findTaskById(taskid);
   }
@@ -85,5 +87,16 @@ export class TaskController {
   async getProjectProgress(@Param('id', ParseIntPipe) projectId: number): Promise<number> {
       const progress = await this.taskService.getProjectProgressByProjectId(projectId);
       return progress;
+  }
+
+  //controller for search tak by name
+  @Get('searchtaskName/search')
+  async searchTaskByName(@Req() req: Request){
+    const builder = await this.taskService.searchTask('tasks');;
+
+    if(req.query.s){
+      builder.where('tasks.taskName like :s', {s: `%${req.query.s}%`});
+    }
+    return builder.getMany();
   }
 }

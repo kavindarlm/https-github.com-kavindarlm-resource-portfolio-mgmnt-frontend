@@ -7,28 +7,10 @@ import { UpdateResourceHolidayDto } from './dto/update-resource_holiday.dto';
 export class ResourceHolidayController {
   constructor(private readonly resourceHolidayService: ResourceHolidayService) {}
 
-  @Post()
-  create(@Body() createResourceHolidayDto: CreateResourceHolidayDto) {
-    return this.resourceHolidayService.create(createResourceHolidayDto);
+  @Get(':resourceId')
+  async getResourceHolidaysByResourceId(@Param('resourceId') resourceId: string) {
+    return await this.resourceHolidayService.getResourceHolidaysByResourceId(resourceId);
   }
+  
 
-  @Get()
-  findAll() {
-    return this.resourceHolidayService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.resourceHolidayService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateResourceHolidayDto: UpdateResourceHolidayDto) {
-    return this.resourceHolidayService.update(+id, updateResourceHolidayDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.resourceHolidayService.remove(+id);
-  }
 }
