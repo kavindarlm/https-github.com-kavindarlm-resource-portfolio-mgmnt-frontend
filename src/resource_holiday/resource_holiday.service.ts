@@ -1,26 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { CreateResourceHolidayDto } from './dto/create-resource_holiday.dto';
 import { UpdateResourceHolidayDto } from './dto/update-resource_holiday.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ResourceHoliday } from './entities/resource_holiday.entity';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class ResourceHolidayService {
-  create(createResourceHolidayDto: CreateResourceHolidayDto) {
-    return 'This action adds a new resourceHoliday';
-  }
-
-  findAll() {
-    return `This action returns all resourceHoliday`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} resourceHoliday`;
-  }
-
-  update(id: number, updateResourceHolidayDto: UpdateResourceHolidayDto) {
-    return `This action updates a #${id} resourceHoliday`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} resourceHoliday`;
-  }
+  constructor(
+    @InjectRepository(ResourceHoliday)
+    private resourceHolidaysRepository: Repository<ResourceHoliday>) {}
+  
+    async getResourceHolidaysByResourceId(resourceId: string) {
+      return await this.resourceHolidaysRepository
+        .createQueryBuilder('resourceHoliday')
+        .leftJoinAndSelect('resourceHoliday.holiday', 'holiday')
+        .leftJoinAndSelect('resourceHoliday.resource', 'resource')
+        .where('resource.resourceId = :resourceId', { resourceId })
+        .getMany();
+    }
 }
