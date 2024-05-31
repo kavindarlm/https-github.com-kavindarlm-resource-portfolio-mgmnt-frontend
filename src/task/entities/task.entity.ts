@@ -26,5 +26,5 @@ export class Task{
 
     @ManyToOne(() => Project, (project) => project.tasks)
     @JoinColumn({ name: 'TaskProjectId' })
-    project: Project;
+    project: Project; 
 }
