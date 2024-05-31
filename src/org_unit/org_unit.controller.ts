@@ -3,6 +3,7 @@ import { OrgUnitService } from './org_unit.service';
 import { CreateOrgUnitDto } from './dto/create-org_unit.dto';
 import { UpdateOrgUnitDto } from './dto/update-org_unit.dto';
 import { relative } from 'path/win32';
+import { OrgUnit } from './entities/org_unit.entity';
 
 @Controller('org-unit')
 export class OrgUnitController {
@@ -40,5 +41,20 @@ export class OrgUnitController {
   async getOrgUnitHierarchy(): Promise<any> {
     return this.orgUnitService.getOrgUnitHierarchy();
     // return "Hierarchy";
+  }
+
+  //To get ancestors
+  // @Get(':unitId/ancestors')
+  // async getAncestors(@Param('unitId', ParseIntPipe) unitId: number) {
+  //   const ancestors = await this.orgUnitService.getAncestors(unitId);
+  //   if (!ancestors || ancestors.length === 0) {
+  //     return { message: 'No ancestors found' };
+  //   }
+  //   return ancestors;
+  // }
+
+  @Get(':unitId/ancestors')
+  async getAncestors(@Param('unitId', ParseIntPipe) unitId: number): Promise<OrgUnit[]> {
+    return this.orgUnitService.getAncestors(unitId);
   }
 }

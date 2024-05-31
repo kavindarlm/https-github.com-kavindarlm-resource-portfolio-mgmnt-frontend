@@ -18,3 +18,4 @@ export class Criticality {
     @OneToMany(() => Project, (project => project.criticality))
     projects: Project[];
 }
+ 
