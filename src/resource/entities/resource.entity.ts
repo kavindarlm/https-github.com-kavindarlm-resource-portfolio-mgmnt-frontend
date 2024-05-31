@@ -1,5 +1,6 @@
 import { JobRole } from "src/job_role/entities/job_role.entity";
 import { OrgUnit } from "src/org_unit/entities/org_unit.entity";
+import { Project } from "src/project/entities/project.entity";
 import { ResourceHoliday } from "src/resource_holiday/entities/resource_holiday.entity";
 import { Team } from "src/team/entities/team.entity";
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
@@ -39,5 +40,11 @@ export class Resource {
 
     @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.resource)
     resourceHolidays: ResourceHoliday[];
+
+    @OneToMany(() => Project, project => project.deliveryManager)
+    projects: Project[];
+   
+    @OneToMany(() => Project, project => project.projectManager)
+    projectss: Project[];
 
 }

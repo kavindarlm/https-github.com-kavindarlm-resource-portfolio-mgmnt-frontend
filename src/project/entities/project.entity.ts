@@ -1,5 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Criticality } from "src/criticality/entities/criticality.entity";
+import { Resource } from "src/resource/entities/resource.entity";
 import { Task } from "src/task/entities/task.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
@@ -24,11 +25,19 @@ export class Project {
     @Column()
     criticality_id: number;
 
-    @Column()
-    projectManager: string;
+    @ManyToOne(() => Resource, resource => resource.projectss)
+    @JoinColumn({name: 'projectManager_id'})
+    projectManager: Resource;
 
     @Column()
-    deliveryManager: string;
+    projectManager_id: string;
+Y
+    @ManyToOne(() => Resource, resource => resource.projects)
+    @JoinColumn({name: 'deliveryManager_id'})
+    deliveryManager: Resource;
+
+    @Column()
+    deliveryManager_id: string;
 
     @Column()
     projectDescription: string;
