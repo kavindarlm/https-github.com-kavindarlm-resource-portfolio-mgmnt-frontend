@@ -18,10 +18,11 @@ import { HolidayModule } from './holiday/holiday.module';
 import { CriticalityModule } from './criticality/criticality.module';
 import { SprintModule } from './sprint/sprint.module';
 import { ResourceAllocationModule } from './resource_allocation/resource_allocation.module';
+import { AuthModule } from './Auth/authModule';
 
 
 @Module({
-  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, FunctionsModule, UsersFunctionModule, ProjectModule, TaskModule, ResourceModule, JobRoleModule, OrgUnitModule, TeamModule, ResourceHolidayModule, HolidayModule, CriticalityModule,SprintModule, ResourceAllocationModule],
+  imports: [TypeOrmModule.forRoot(typeOrmConfig), UserModule, FunctionsModule, UsersFunctionModule, ProjectModule, TaskModule, ResourceModule, JobRoleModule, OrgUnitModule, TeamModule, ResourceHolidayModule, HolidayModule, CriticalityModule,SprintModule, ResourceAllocationModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })
