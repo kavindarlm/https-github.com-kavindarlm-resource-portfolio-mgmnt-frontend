@@ -5,12 +5,16 @@ import { Repository } from 'typeorm';
 import { Project } from 'src/project/entities/project.entity';
 import { createTaskDto } from './dto/createTask.dto';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
+import { ResourceAllocation } from 'src/resource_allocation/entities/resource_allocation.entity';
+import { Resource } from 'src/resource/entities/resource.entity';
 
 @Injectable()
 export class TaskService {
     constructor(
         @InjectRepository(Task) private taskRepository: Repository<Task>,
-        @InjectRepository(Project) private projectRepository: Repository<Project>
+        @InjectRepository(Project) private projectRepository: Repository<Project>,
+        @InjectRepository(ResourceAllocation) private resourceAllocationRepository: Repository<ResourceAllocation>,
+        @InjectRepository(Resource) private resourceRepository: Repository<Resource>
     ) { }
 
     //Service for finding project name and project ID by task ID
@@ -166,6 +170,28 @@ export class TaskService {
     async searchTask(alias: string){
         return this.taskRepository.createQueryBuilder(alias)
     }
+
+    //Service for get resources by project ID
+    async getResourcesByProjectId(projectId: number): Promise<Resource[]> {
+        const resourceAllocations = await this.resourceAllocationRepository
+            .createQueryBuilder('resourceAllocation')
+            .innerJoinAndSelect('resourceAllocation.task', 'task')
+            .innerJoinAndSelect('task.project', 'project')
+            .innerJoinAndSelect('resourceAllocation.resource', 'resource')
+            .where('project.projectid = :projectId', { projectId })
+            .getMany();
     
+        // Extract resources from resource allocations
+        const resources = resourceAllocations.map(ra => ra.resource);
     
+        // Filter out duplicate resources based on resourceId
+        const uniqueResourcesMap = new Map<string, Resource>();
+        resources.forEach(resource => {
+            uniqueResourcesMap.set(resource.resourceId, resource);
+        });
+    
+        return Array.from(uniqueResourcesMap.values());
+    }
+    
+
 }

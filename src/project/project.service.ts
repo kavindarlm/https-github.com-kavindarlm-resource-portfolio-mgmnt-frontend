@@ -186,5 +186,19 @@ export class ProjectService {
       resourceName: resource.resourceName,
     }));
   }
+
+  //Get resource by id
+  async getResourceNameById(resourceId: string): Promise<{ resourceId: string; resourceName: string }> {
+    try {
+      const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+      if (!resource) {
+        throw new NotFoundException(`Resource with ID ${resourceId} not found`);
+      }
+      return { resourceId: resource.resourceId, resourceName: resource.resourceName };
+    } catch (error) {
+      throw new BadRequestException(`Could not fetch resource with ID ${resourceId}`);
+    }
+  }
+
 }
 
