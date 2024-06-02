@@ -107,5 +107,17 @@ export class ProjectController {
   async getResourceNameAndId(): Promise<{ resourceId: string; resourceName: string }[]> {
     return this.projectService.getResourceNameAndId();
   }
+
+  @Get('resourceNameById/:resourceId')
+  async getResourceNameById(@Param('resourceId') resourceId: string) {
+    try {
+      return await this.projectService.getResourceNameById(resourceId);
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw new NotFoundException(error.message);
+      }
+      throw new BadRequestException(error.message);
+    }
+  }
   
 }

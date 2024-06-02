@@ -31,7 +31,7 @@ export class Project {
 
     @Column()
     projectManager_id: string;
-Y
+
     @ManyToOne(() => Resource, resource => resource.projects)
     @JoinColumn({name: 'deliveryManager_id'})
     deliveryManager: Resource;
