@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { UsersFunctionService } from './users_function.service';
 import { CreateUsersFunctionDto } from './dto/create-users_function.dto';
 import { UpdateUsersFunctionDto } from './dto/update-users_function.dto';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('users-function')
 export class UsersFunctionController {
@@ -12,11 +13,13 @@ export class UsersFunctionController {
     return this.usersFunctionService.create(createUsersFunctionDto);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/getUserFunction/:id')
   findone(@Param('id') id: string) {
     return this.usersFunctionService.findFunctionIdByUserId(+id);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Patch('/updateUserFunction/:id')
   update(@Param('id') id: string, @Body() updateUsersFunctionDto: UpdateUsersFunctionDto) {
     return this.usersFunctionService.updateUserFunction(+id, updateUsersFunctionDto);
