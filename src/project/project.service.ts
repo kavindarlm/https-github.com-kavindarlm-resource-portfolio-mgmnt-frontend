@@ -206,6 +206,7 @@ export class ProjectService {
       const projects = await this.projectRepository.find({
         where: { criticality_id: criticalityId },
         select: [
+          'projectid',
           'projectName',
           'projectStartDate',
           'projectEndDate',
