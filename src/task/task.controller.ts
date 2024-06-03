@@ -16,6 +16,7 @@ import { createTaskDto } from './dto/createTask.dto';
 import { Task } from './entities/task.entity';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 import { Request } from 'express';
+import { Resource } from 'src/resource/entities/resource.entity';
 
 @Controller('task')
 export class TaskController {
@@ -98,5 +99,10 @@ export class TaskController {
       builder.where('tasks.taskName like :s', {s: `%${req.query.s}%`});
     }
     return builder.getMany();
+  }
+
+  @Get('project/:projectId/resources')
+  async getResourcesByProjectId(@Param('projectId') projectId: number): Promise<Resource[]> {
+    return this.taskService.getResourcesByProjectId(projectId);
   }
 }

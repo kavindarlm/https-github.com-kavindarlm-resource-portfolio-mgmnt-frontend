@@ -186,5 +186,44 @@ export class ProjectService {
       resourceName: resource.resourceName,
     }));
   }
+
+  //Get resource by id
+  async getResourceNameById(resourceId: string): Promise<{ resourceId: string; resourceName: string }> {
+    try {
+      const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+      if (!resource) {
+        throw new NotFoundException(`Resource with ID ${resourceId} not found`);
+      }
+      return { resourceId: resource.resourceId, resourceName: resource.resourceName };
+    } catch (error) {
+      throw new BadRequestException(`Could not fetch resource with ID ${resourceId}`);
+    }
+  }
+
+  // Get projects by criticality ID
+  async getProjectsByCriticality(criticalityId: number): Promise<Partial<Project>[]> {
+    try {
+      const projects = await this.projectRepository.find({
+        where: { criticality_id: criticalityId },
+        select: [
+          'projectid',
+          'projectName',
+          'projectStartDate',
+          'projectEndDate',
+          'criticality_id',
+          'projectManager_id',
+          'deliveryManager_id',
+          'projectDescription',
+        ],
+      });
+
+      return projects || [];
+    } catch (error) {
+      throw new BadRequestException(`Could not get projects by criticality ID ${criticalityId}`);
+    }
+  }
+
 }
+
+
 

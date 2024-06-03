@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UsePipes, ValidationPipe, BadRequestException, UnauthorizedException, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -10,6 +10,7 @@ import { Req } from '@nestjs/common';
 import { UsersFunctionService } from '../users_function/users_function.service';
 import * as nodemailer from 'nodemailer';
 import { NotFoundException } from '@nestjs/common';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -73,8 +74,7 @@ export class UserController {
 
   @Post('login')
   async login(@Body() createUserDto: CreateUserDto,
-    @Res({ passthrough: true }) response: Response
-  ) {
+    @Res({ passthrough: true }) response: Response) {
     console.log('Incoming Login Request');
     const user = await this.userService.findLoginUser({ where: { user_email: createUserDto.user_email } });
 
@@ -101,6 +101,7 @@ export class UserController {
 
 
   //get user details after login
+  @UseGuards(JwtAuthGuard)
   @Get('user')
   async user(@Req() request: Request) {
     try {
@@ -121,6 +122,7 @@ export class UserController {
   }
 
   //logout
+  @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt');
@@ -133,18 +135,21 @@ export class UserController {
 
 
   //find all users
+  @UseGuards(JwtAuthGuard)
   @Get('findAll')
-  findAll() {
+  findAll(@Req() req: Request) {
     return this.userService.findAll();
   }
 
   //find all users
+  @UseGuards(JwtAuthGuard)
   @Get('findAllUsers')
-  findAllUsers() {
+  findAllUsers(@Req() req: Request) {
     return this.userService.findAllUsers();
   }
 
   //find all admins
+  @UseGuards(JwtAuthGuard)
   @Get('findAllAdmins')
   findAllAdmins() {
     return this.userService.findAllAdmins();
@@ -152,12 +157,14 @@ export class UserController {
 
 
   //find single user by id
+  @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   findSingleUser(@Param('id') id: number) {
     return this.userService.findUserById(id);
   }
 
   //update user by id
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
     const user = await this.userService.findUserById(id);
@@ -199,6 +206,7 @@ export class UserController {
   }
 
   //delete user by id
+  @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     await this.usersFunctionService.deleteUserFunction(id);
@@ -206,6 +214,7 @@ export class UserController {
   }
 
   //  controller for searching users by user name
+  @UseGuards(JwtAuthGuard)
   @Get('searchUserName/search')
   async searchUsers(@Req() req: Request) {
     const builder = await this.userService.searchUser('user_name');;
@@ -217,6 +226,7 @@ export class UserController {
   }
 
   //update password
+  @UseGuards(JwtAuthGuard)
   @Post('resetPassword')
   async updatePassword(@Body('user_id') user_id: number, @Body('currentPassword') currentPassword: string, @Body('newPassword') newPassword: string) {
     return this.userService.updatePassword(user_id, currentPassword, newPassword);
@@ -226,7 +236,6 @@ export class UserController {
   @Post('forgotPassword')
   async forgotPassword(@Body('user_email') user_email: string) {
     const user = await this.userService.findLoginUser({ where: { user_email: user_email } });
-
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -253,6 +262,24 @@ export class UserController {
 
     user.password = hashedPassword;
     return this.userService.updateUserById(user.user_id, user);
+  }
+
+  //is admin
+  @UseGuards(JwtAuthGuard)
+  @Get('isAdmin/:id')
+  async isAdmin(@Param('id') id: number) {
+    const user = await this.userService.findUserById(id);
+    if (user.user_role === 'admin') {
+      return true;
+    }
+    return false;
+  }
+
+  //get admin count
+  @UseGuards(JwtAuthGuard)
+  @Get('adminCount')
+  async adminCount() {
+    return this.userService.adminCount();
   }
 
 }
