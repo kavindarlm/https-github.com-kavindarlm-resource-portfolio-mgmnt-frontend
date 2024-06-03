@@ -5,12 +5,16 @@ import { Repository } from 'typeorm';
 import { Project } from 'src/project/entities/project.entity';
 import { createTaskDto } from './dto/createTask.dto';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
+import { ResourceAllocation } from 'src/resource_allocation/entities/resource_allocation.entity';
+import { Resource } from 'src/resource/entities/resource.entity';
 
 @Injectable()
 export class TaskService {
     constructor(
         @InjectRepository(Task) private taskRepository: Repository<Task>,
-        @InjectRepository(Project) private projectRepository: Repository<Project>
+        @InjectRepository(Project) private projectRepository: Repository<Project>,
+        @InjectRepository(ResourceAllocation) private resourceAllocationRepository: Repository<ResourceAllocation>,
+        @InjectRepository(Resource) private resourceRepository: Repository<Resource>
     ) { }
 
     //Service for finding project name and project ID by task ID
@@ -112,9 +116,9 @@ export class TaskService {
 
     //service to get the sum of allocation percetage of tasks by project ID
     async getSumOfAllocationPercentageByProjectId(TaskProjectId: number): Promise<number> {
-        try{
-            const tasks = await this.taskRepository.find({ where: { project:{projectid: TaskProjectId}}});
-            if(!tasks || tasks.length === 0){
+        try {
+            const tasks = await this.taskRepository.find({ where: { project: { projectid: TaskProjectId } } });
+            if (!tasks || tasks.length === 0) {
                 throw new NotFoundException(`Tasks for project ID ${TaskProjectId} not found`);
             }
 
@@ -125,7 +129,7 @@ export class TaskService {
 
             return sum;
         } catch (error) {
-            throw new NotFoundException('Could not find tasks for the project');
+            // throw new NotFoundException('Could not find tasks for the project');
         }
     }
 
@@ -133,39 +137,65 @@ export class TaskService {
         try {
             // Retrieve all tasks for the project
             const tasks = await this.taskRepository.find({ where: { project: { projectid: ProjectId } } });
-    
+
             if (!tasks || tasks.length === 0) {
                 throw new NotFoundException(`Tasks for project ID ${ProjectId} not found`);
             }
-    
+
             // Calculate the weighted sum of task progress percentages
             const weightedSum = tasks.reduce((accumulator, currentTask) => {
                 return accumulator + ((currentTask.taskAllocationPercentage / 100) * (currentTask.taskProgressPercentage / 100));
             }, 0);
-    
+
             // Calculate the total weight (sum of task allocation percentages)
             const totalWeight = tasks.reduce((accumulator, currentTask) => {
                 return accumulator + (currentTask.taskAllocationPercentage / 100);
             }, 0);
-    
+
             // Ensure the total weight is equal to 1 (100%)
             if (totalWeight !== 1) {
                 // throw new Error('Total weight of task allocation percentages should be equal to 100%');
             }
-    
+
             // Calculate the project progress percentage
             const projectProgress = weightedSum * 100; // Total weight is already 1, so no need to divide
-    
-            return projectProgress;
+
+            // Round the project progress to the first decimal place
+            const roundedProjectProgress = parseFloat(projectProgress.toFixed(1));
+
+            return roundedProjectProgress;
         } catch (error) {
-            throw new NotFoundException('Could not calculate project progress');
+            // throw new NotFoundException('Could not calculate project progress');
+            
         }
     }
-    
+
     //Service for search Task by name
-    async searchTask(alias: string){
+    async searchTask(alias: string) {
         return this.taskRepository.createQueryBuilder(alias)
     }
-    
-    
+
+    //Service for get resources by project ID
+    async getResourcesByProjectId(projectId: number): Promise<Resource[]> {
+        const resourceAllocations = await this.resourceAllocationRepository
+            .createQueryBuilder('resourceAllocation')
+            .innerJoinAndSelect('resourceAllocation.task', 'task')
+            .innerJoinAndSelect('task.project', 'project')
+            .innerJoinAndSelect('resourceAllocation.resource', 'resource')
+            .where('project.projectid = :projectId', { projectId })
+            .getMany();
+
+        // Extract resources from resource allocations
+        const resources = resourceAllocations.map(ra => ra.resource);
+
+        // Filter out duplicate resources based on resourceId
+        const uniqueResourcesMap = new Map<string, Resource>();
+        resources.forEach(resource => {
+            uniqueResourcesMap.set(resource.resourceId, resource);
+        });
+
+        return Array.from(uniqueResourcesMap.values());
+    }
+
+
 }
