@@ -82,4 +82,8 @@ export class UserService {
     return updatedUser;
   }
 
+  adminCount() {
+    return this.userRepo.count({ where: { user_role: 'admin' } });
+  }
+
 }
