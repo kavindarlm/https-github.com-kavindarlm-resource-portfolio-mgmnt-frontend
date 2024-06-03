@@ -200,5 +200,30 @@ export class ProjectService {
     }
   }
 
+  // Get projects by criticality ID
+  async getProjectsByCriticality(criticalityId: number): Promise<Partial<Project>[]> {
+    try {
+      const projects = await this.projectRepository.find({
+        where: { criticality_id: criticalityId },
+        select: [
+          'projectid',
+          'projectName',
+          'projectStartDate',
+          'projectEndDate',
+          'criticality_id',
+          'projectManager_id',
+          'deliveryManager_id',
+          'projectDescription',
+        ],
+      });
+
+      return projects || [];
+    } catch (error) {
+      throw new BadRequestException(`Could not get projects by criticality ID ${criticalityId}`);
+    }
+  }
+
 }
+
+
 
