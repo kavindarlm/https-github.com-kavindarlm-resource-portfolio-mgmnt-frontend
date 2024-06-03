@@ -129,7 +129,7 @@ export class TaskService {
 
             return sum;
         } catch (error) {
-            throw new NotFoundException('Could not find tasks for the project');
+            // throw new NotFoundException('Could not find tasks for the project');
         }
     }
 
@@ -165,7 +165,8 @@ export class TaskService {
 
             return roundedProjectProgress;
         } catch (error) {
-            throw new NotFoundException('Could not calculate project progress');
+            // throw new NotFoundException('Could not calculate project progress');
+            
         }
     }
 
