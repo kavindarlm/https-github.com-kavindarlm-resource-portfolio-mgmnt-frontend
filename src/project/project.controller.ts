@@ -9,6 +9,7 @@ import {
   Req,
   NotFoundException,
   BadRequestException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
@@ -118,6 +119,11 @@ export class ProjectController {
       }
       throw new BadRequestException(error.message);
     }
+  }
+
+  @Get('getProjectByCriticalityId/:criticalityId')
+  async getProjectsByCriticality(@Param('criticalityId', ParseIntPipe) criticalityId: number): Promise<Partial<Project>[]> {
+    return await this.projectService.getProjectsByCriticality(criticalityId);
   }
   
 }
