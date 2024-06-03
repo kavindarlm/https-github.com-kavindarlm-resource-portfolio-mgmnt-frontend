@@ -7,8 +7,9 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class OrgUnitService {
-
-  constructor(@InjectRepository(OrgUnit) private orgUnitRepository: Repository<OrgUnit>) {}
+  constructor(
+    @InjectRepository(OrgUnit) private orgUnitRepository: Repository<OrgUnit>,
+  ) {}
 
   findOrgUnits() {
     return this.orgUnitRepository.find();
@@ -16,26 +17,34 @@ export class OrgUnitService {
 
   createOrgUnit(orgUnitDetails: CreateOrgUnitParams) {
     //create method is not asynchronous so don't have to await it
-    const newOrgUnit = this.orgUnitRepository.create({...orgUnitDetails, createdAt: new Date()});
+    const newOrgUnit = this.orgUnitRepository.create({
+      ...orgUnitDetails,
+      createdAt: new Date(),
+    });
     return this.orgUnitRepository.save(newOrgUnit);
   }
 
-  updateOrgUnit(unitId: number, updateOrgUnitDetails:UpdateOrgUnitParams) {
-    return this.orgUnitRepository.update({unitId}, {...updateOrgUnitDetails});
+  updateOrgUnit(unitId: number, updateOrgUnitDetails: UpdateOrgUnitParams) {
+    return this.orgUnitRepository.update(
+      { unitId },
+      { ...updateOrgUnitDetails },
+    );
   }
 
   deleteOrgUnit(unitId: number) {
-    return this.orgUnitRepository.delete({unitId});
+    return this.orgUnitRepository.delete({ unitId });
   }
 
   async getUnitById(unitId: number): Promise<OrgUnit | undefined> {
-    return this.orgUnitRepository.findOne({ where: { unitId }, relations: ['parent'] });
+    return this.orgUnitRepository.findOne({
+      where: { unitId },
+      relations: ['parent'],
+    });
   }
-
 
   async getUnitNameById(unitId: number): Promise<string | undefined> {
     const orgUnit = await this.orgUnitRepository.findOne({ where: { unitId } });
-    return orgUnit? orgUnit.unitName: '';
+    return orgUnit ? orgUnit.unitName : '';
   }
 
   async getOrgUnitHierarchy(): Promise<any> {
@@ -43,11 +52,10 @@ export class OrgUnitService {
     const hierarchy = this.buildHierarchy(orgUnits, null);
     return hierarchy.length > 0 ? hierarchy[0] : null; // Return the first element if the hierarchy is not empty, otherwise return null
   }
-  
 
   private buildHierarchy(orgUnits: OrgUnit[], parentId: number | null): any {
     const result: any[] = [];
-    orgUnits.forEach(unit => {
+    orgUnits.forEach((unit) => {
       if (unit.parentId === parentId) {
         const children = this.buildHierarchy(orgUnits, unit.unitId);
         result.push({
@@ -55,16 +63,15 @@ export class OrgUnitService {
           unitId: unit.unitId,
           parentId: unit.parentId,
           description: unit.description,
-          children: children
+          children: children,
         });
       }
     });
     return result;
   }
 
-
   //To get the ancestors
-  
+
   // async getAncestors(unitId: number): Promise<OrgUnit[]> {
   //   const ancestors: OrgUnit[] = [];
   //   let currentUnit = await this.getUnitById(unitId);
@@ -83,7 +90,7 @@ export class OrgUnitService {
   //     where: { unitId },
   //     relations: ['parent'],
   //   });
-  
+
   //   while (currentUnit && currentUnit.parent) {
   //     currentUnit = await this.orgUnitRepository.findOne({
   //       where: { unitId: currentUnit.parent.unitId },
@@ -112,5 +119,21 @@ export class OrgUnitService {
     return ancestors;
   }
 
-}
+  async getParentDetailsRecursive(orgUnitId: number): Promise<OrgUnit[]> {
+    const result = [];
 
+    let currentOrgUnit = await this.orgUnitRepository.findOne({
+      where: { unitId: orgUnitId },
+    });
+
+    while (currentOrgUnit) {
+      result.push(currentOrgUnit);
+      if (!currentOrgUnit.parentId) break;
+
+      currentOrgUnit = await this.orgUnitRepository.findOne({
+        where: { unitId: currentOrgUnit.parentId },
+      });
+    }
+    return result;
+  }
+}

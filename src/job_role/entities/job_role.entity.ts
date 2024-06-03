@@ -1,10 +1,11 @@
 import { Resource } from "src/resource/entities/resource.entity";
-import { Column, Entity, OneToMany, PrimaryColumn } from "typeorm";
+import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'job_role'})
 export class JobRole {
 
-    @PrimaryColumn()
+    //Changed Primary Column to PrimaryGeneratedColumn
+    @PrimaryGeneratedColumn()
     roleId: number;
 
     @Column()

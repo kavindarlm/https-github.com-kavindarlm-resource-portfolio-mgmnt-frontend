@@ -30,8 +30,15 @@ export class TeamService {
   }
 
   //method to create team by updating teamid column in resource table
-  async createTeamAndAssignResources(createTeamParams: CreateTeamParams): Promise<Team> {
+  async createTeamAndAssignResources(createTeamParams: CreateTeamParams): Promise<Team | null> {
     const { teamName, team_description, resourceIds } = createTeamParams;
+  
+    // Check if any of the required parameters are null
+    if (!teamName || !team_description || !resourceIds || resourceIds.length === 0) {
+      // You can either return null or throw an error
+      return null;
+      // throw new Error('Invalid parameters');
+    }
   
     // Map 'teamName' to 'team_Name'
     const team_Name = teamName;
@@ -97,7 +104,7 @@ export class TeamService {
             .createQueryBuilder()
             .delete()
             .from(Team)
-            .where("id = :id", { id })
+            .where("teamId = :id", { id })
             .execute();
 
         if (result.affected === 0) {
