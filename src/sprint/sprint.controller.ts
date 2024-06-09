@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException, Put, Delete } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 import { Sprint } from './entities/sprint.entity';
@@ -13,7 +13,6 @@ export class SprintController {
     return this.sprintService.findAll();
   }
 
-  // Route with parameter, defined after `last-id`
   @Get(':sprint_id')
   async findOneById(@Param('sprint_id') sprintId: number): Promise<Sprint> {
     const sprint = await this.sprintService.findOneById(sprintId);
@@ -45,5 +44,10 @@ export class SprintController {
   ): Promise<Sprint> {
     return this.sprintService.update(sprintId, updateSprintDto);
   }
-  
+
+  @Delete(':sprint_id')
+  async delete(@Param('sprint_id') sprintId: number): Promise<void> {
+    return this.sprintService.delete(sprintId);
+  }
+
 }

@@ -36,15 +36,15 @@ export class SprintService {
     // Save the sprint to the database
     return this.sprintRepository.save(sprint);
   }
-  
-   // Method to find a sprint by its name
-   async findOneByName(sprintName: string): Promise<Sprint | null> {
+
+  // Method to find a sprint by its name
+  async findOneByName(sprintName: string): Promise<Sprint | null> {
     return this.sprintRepository.findOne({
-        where: {
-            sprint_name: sprintName,
-        },
+      where: {
+        sprint_name: sprintName,
+      },
     });
-}
+  }
 
   //Method to update sprint
   async update(sprint_id: number, updateSprintDto: UpdateSprintDto): Promise<Sprint> {
@@ -58,6 +58,15 @@ export class SprintService {
 
     // Save the updated sprint to the database
     return this.sprintRepository.save(sprint);
+  }
+
+  // Method to delete a sprint by its ID
+  async delete(sprint_id: number): Promise<void> {
+    const sprint = await this.findOneById(sprint_id);
+    if (!sprint) {
+      throw new NotFoundException(`Sprint with ID ${sprint_id} not found`);
+    }
+    await this.sprintRepository.remove(sprint);
   }
 
 }
