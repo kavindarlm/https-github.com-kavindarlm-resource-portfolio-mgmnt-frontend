@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Sprint } from './entities/sprint.entity';
@@ -12,8 +12,6 @@ export class SprintService {
     @InjectRepository(Sprint)
     private sprintRepository: Repository<Sprint>, // Inject the Sprint repository
   ) { }
-
-
 
   async findAll(): Promise<Sprint[]> {
     // Use the repository to find all sprints in the database
@@ -48,5 +46,18 @@ export class SprintService {
     });
 }
 
+  //Method to update sprint
+  async update(sprint_id: number, updateSprintDto: UpdateSprintDto): Promise<Sprint> {
+    const sprint = await this.findOneById(sprint_id);
+    if (!sprint) {
+      throw new NotFoundException(`Sprint with ID ${sprint_id} not found`);
+    }
+
+    // Update the sprint's properties
+    Object.assign(sprint, updateSprintDto);
+
+    // Save the updated sprint to the database
+    return this.sprintRepository.save(sprint);
+  }
 
 }

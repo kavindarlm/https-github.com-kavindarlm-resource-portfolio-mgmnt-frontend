@@ -13,7 +13,7 @@ export class ResourceAllocationController {
   @Get(':resourceId')
   async getTasksByResourceId(
     @Param('resourceId') resourceId: string
-  ): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
+  ): Promise<{  resourceAllocation: ResourceAllocation }[]> {
     // Call the service function and return the result
     return this.resourceAllocationService.getTasksByResourceId(resourceId);
   }

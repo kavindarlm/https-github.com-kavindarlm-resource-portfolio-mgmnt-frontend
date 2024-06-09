@@ -54,7 +54,7 @@ export class ResourceAllocationService {
   }
 
 
-  async getTasksByResourceId(resourceId: string): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
+  async getTasksByResourceId(resourceId: string): Promise<{ resourceAllocation: ResourceAllocation }[]> {
     // Fetching resource allocations with related task data based on the provided resourceId
     const resourceAllocations = await this.resourceAllocationRepository.find({
       where: { resource: { resourceId: resourceId } },
@@ -63,7 +63,7 @@ export class ResourceAllocationService {
 
     // Return an array of objects containing both task and resource allocation details
     return resourceAllocations.map(resourceAllocation => ({
-      task: resourceAllocation.task, // task details
+      // task: resourceAllocation.task, // task details
       resourceAllocation: resourceAllocation, // resource allocation details
     }));
   }
