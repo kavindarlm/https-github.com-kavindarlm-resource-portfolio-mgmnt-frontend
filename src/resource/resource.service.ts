@@ -10,6 +10,11 @@ import { UpdateResourceParams } from './dto/update-resource.dto';
 import { JobRole } from 'src/job_role/entities/job_role.entity';
 import { OrgUnit } from 'src/org_unit/entities/org_unit.entity';
 
+export interface ResourceWithInitials extends Resource {
+  initials?: string;
+}
+
+
 @Injectable()
 export class ResourceService {
 
@@ -142,11 +147,24 @@ async getResourcesByTeamId(teamId: number, jobRole?: string, orgUnit?: string): 
 }
 
 // In your ResourceService
-async getResourceById(resourceId: string): Promise<Resource> {
-  const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+// async getResourceById(resourceId: string): Promise<Resource> {
+//   const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+//   if (!resource) {
+//     throw new NotFoundException(`Resource with id ${resourceId} not found`);
+//   }
+//   return resource;
+// }
+
+async getResourceById(resourceId: string): Promise<ResourceWithInitials> {
+  const resource = await this.resourceRepository.findOne({ where: { resourceId } }) as ResourceWithInitials;
   if (!resource) {
     throw new NotFoundException(`Resource with id ${resourceId} not found`);
   }
+
+  // Get the initials of the name
+  const nameParts = resource.resourceName.split(' ');
+  resource.initials = nameParts.map(part => part.charAt(0).toUpperCase()).join('');
+
   return resource;
 }
 
