@@ -72,6 +72,7 @@ export class UserController {
     }
   }
 
+  // controller for login
   @Post('login')
   async login(@Body() createUserDto: CreateUserDto,
     @Res({ passthrough: true }) response: Response) {
@@ -100,7 +101,7 @@ export class UserController {
   }
 
 
-  //get user details after login
+  // controller for getting user
   @UseGuards(JwtAuthGuard)
   @Get('user')
   async user(@Req() request: Request) {
@@ -121,7 +122,7 @@ export class UserController {
     }
   }
 
-  //logout
+  // controller for logout
   @UseGuards(JwtAuthGuard)
   @Post('logout')
   async logout(@Res({ passthrough: true }) response: Response) {
@@ -134,21 +135,21 @@ export class UserController {
   }
 
 
-  //find all users
+  // controller for getting all users and admins
   @UseGuards(JwtAuthGuard)
   @Get('findAll')
   findAll(@Req() req: Request) {
     return this.userService.findAll();
   }
 
-  //find all users
+  // controller for getting all users
   @UseGuards(JwtAuthGuard)
   @Get('findAllUsers')
   findAllUsers(@Req() req: Request) {
     return this.userService.findAllUsers();
   }
 
-  //find all admins
+  // controller for getting all admins
   @UseGuards(JwtAuthGuard)
   @Get('findAllAdmins')
   findAllAdmins() {
@@ -156,14 +157,14 @@ export class UserController {
   }
 
 
-  //find single user by id
+  // controller for getting a user by id 
   @UseGuards(JwtAuthGuard)
   @Get('find/:id')
   findSingleUser(@Param('id') id: number) {
     return this.userService.findUserById(id);
   }
 
-  //update user by id
+  // controller for updating a user
   @UseGuards(JwtAuthGuard)
   @Patch(':id')
   async updateUser(@Param('id') id: number, @Body() updateUser: UpdateUserDto) {
@@ -205,7 +206,7 @@ export class UserController {
     return this.userService.updateUserById(id, user);
   }
 
-  //delete user by id
+  // controller for deleting a user
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
@@ -213,7 +214,7 @@ export class UserController {
     return this.userService.deleteUserById(id);
   }
 
-  //  controller for searching users by user name
+  // controller for searching users by user name
   @UseGuards(JwtAuthGuard)
   @Get('searchUserName/search')
   async searchUsers(@Req() req: Request) {
@@ -225,14 +226,14 @@ export class UserController {
     return builder.getMany();
   }
 
-  //update password
+  // controller for reset new password
   @UseGuards(JwtAuthGuard)
   @Post('resetPassword')
   async updatePassword(@Body('user_id') user_id: number, @Body('currentPassword') currentPassword: string, @Body('newPassword') newPassword: string) {
     return this.userService.updatePassword(user_id, currentPassword, newPassword);
   }
 
-  //forgot password
+  // controller for forgot password
   @Post('forgotPassword')
   async forgotPassword(@Body('user_email') user_email: string) {
     const user = await this.userService.findLoginUser({ where: { user_email: user_email } });
@@ -264,7 +265,7 @@ export class UserController {
     return this.userService.updateUserById(user.user_id, user);
   }
 
-  //is admin
+  // controller for checking whether the user is an admin
   @UseGuards(JwtAuthGuard)
   @Get('isAdmin/:id')
   async isAdmin(@Param('id') id: number) {
@@ -275,7 +276,7 @@ export class UserController {
     return false;
   }
 
-  //get admin count
+  // controller for getting all admins count
   @UseGuards(JwtAuthGuard)
   @Get('adminCount')
   async adminCount() {
