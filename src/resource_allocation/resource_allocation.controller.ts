@@ -2,7 +2,6 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, H
 import { ResourceAllocationService } from './resource_allocation.service';
 import { CreateResourceAllocationDto } from './dto/create-resource_allocation.dto';
 import { UpdateResourceAllocationDto } from './dto/update-resource_allocation.dto';
-import { Task } from 'src/task/entities/task.entity';
 import { ResourceAllocation } from './entities/resource_allocation.entity';
 
 @Controller('resource-allocation')
@@ -13,7 +12,7 @@ export class ResourceAllocationController {
   @Get(':resourceId')
   async getTasksByResourceId(
     @Param('resourceId') resourceId: string
-  ): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
+  ): Promise<{ resourceAllocation: ResourceAllocation }[]> {
     // Call the service function and return the result
     return this.resourceAllocationService.getTasksByResourceId(resourceId);
   }
@@ -41,6 +40,20 @@ export class ResourceAllocationController {
     } catch (error) {
       // Log the error and throw an HTTP exception with appropriate status
       console.error(`Error deleting resource allocation with ID ${id}:`, error);
+    }
+  }
+
+  // Endpoint to delete all resource allocations by sprint ID
+  @Delete('/sprint/:sprintId')
+  async deleteResourceAllocationsBySprintId(@Param('sprintId') sprintId: number): Promise<void> {
+    try {
+      // Call the service method to delete all resource allocations by sprint ID
+      await this.resourceAllocationService.deleteResourceAllocationsBySprintId(sprintId);
+      console.log(`Resource allocations for sprint ID ${sprintId} deleted successfully.`);
+    } catch (error) {
+      // Log the error and throw an HTTP exception with appropriate status
+      console.error(`Error deleting resource allocations for sprint ID ${sprintId}:`, error);
+      throw new HttpException('Unable to delete resource allocations by sprint ID', HttpStatus.INTERNAL_SERVER_ERROR);
     }
   }
 
