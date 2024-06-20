@@ -23,7 +23,7 @@ import { GetUser } from 'src/Auth/get-user.decorator';
 @Controller('project')
 @UseGuards(AuthGuard('jwt'))
 export class ProjectController {
-  constructor(private readonly projectService: ProjectService) {}
+  constructor(private readonly projectService: ProjectService) { }
 
   //controller for getting all projects
   @Get()
@@ -104,7 +104,6 @@ export class ProjectController {
   @Get('searchprojectName/search')
   async searchProjects(@Req() req: Request) {
     const builder = await this.projectService.searchProject('projects');
-
     if (req.query.s) {
       builder.where('projects.projectName like :s', { s: `%${req.query.s}%` });
     }
@@ -119,6 +118,7 @@ export class ProjectController {
     return this.projectService.getResourceNameAndId();
   }
 
+  // controller for getting resource name by resource id
   @Get('resourceNameById/:resourceId')
   async getResourceNameById(@Param('resourceId') resourceId: string) {
     try {
@@ -131,10 +131,22 @@ export class ProjectController {
     }
   }
 
+  // controller for getting project name and project ID by task ID
   @Get('getProjectByCriticalityId/:criticalityId')
   async getProjectsByCriticality(
     @Param('criticalityId', ParseIntPipe) criticalityId: number,
   ): Promise<Partial<Project>[]> {
     return await this.projectService.getProjectsByCriticality(criticalityId);
   }
+
+  // controller for getting criticality count
+  @Get('criticality/count')
+  async countProjectsByCriticality(): Promise<{ high: number, low: number, medium: number }> {
+    const high = await this.projectService.countHighCriticalityProjects();
+    const low = await this.projectService.countLowCriticalityProjects();
+    const medium = await this.projectService.countMediumCriticalityProjects();
+
+    return { high, low, medium };
+  }
+  
 }
