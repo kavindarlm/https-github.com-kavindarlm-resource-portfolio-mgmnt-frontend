@@ -10,14 +10,17 @@ import {
   ParseIntPipe,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrgUnitService } from './org_unit.service';
 import { CreateOrgUnitDto } from './dto/create-org_unit.dto';
 import { UpdateOrgUnitDto } from './dto/update-org_unit.dto';
 import { relative } from 'path/win32';
 import { OrgUnit } from './entities/org_unit.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('org-unit')
+@UseGuards(JwtAuthGuard)
 export class OrgUnitController {
   constructor(private orgUnitService: OrgUnitService) { }
 

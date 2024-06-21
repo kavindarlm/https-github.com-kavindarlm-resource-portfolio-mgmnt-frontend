@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -19,12 +18,12 @@ import { Task } from './entities/task.entity';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 import { Request } from 'express';
 import { Resource } from 'src/resource/entities/resource.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/Auth/get-user.decorator';
 import { User } from 'src/user/entities/user.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('task')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
@@ -102,7 +101,7 @@ export class TaskController {
       return progress;
   }
 
-  //controller for search tak by name
+  //controller for search task by name
   @Get('searchtaskName/search')
   async searchTaskByName(@Req() req: Request){
     const builder = await this.taskService.searchTask('tasks');;

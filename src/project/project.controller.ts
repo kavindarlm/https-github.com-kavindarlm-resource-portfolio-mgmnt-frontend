@@ -17,11 +17,11 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
 import { Request } from 'express';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/Auth/get-user.decorator';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('project')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) { }
 

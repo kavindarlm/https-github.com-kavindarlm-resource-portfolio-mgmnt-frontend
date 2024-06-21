@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Param, NotFoundException, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, NotFoundException, Put, Delete, UseGuards } from '@nestjs/common';
 import { SprintService } from './sprint.service';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 import { Sprint } from './entities/sprint.entity';
 import { UpdateSprintDto } from './dto/update-sprint.dto';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('sprint')
+@UseGuards(JwtAuthGuard)
 export class SprintController {
   constructor(private readonly sprintService: SprintService) { }
 
