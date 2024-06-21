@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, ParseIntPipe, Put, UseGuards } from '@nestjs/common';
 import { JobRoleService } from './job_role.service';
 import { CreateJobRoleDto } from './dto/create-job_role.dto';
 import { UpdateJobRoleDto } from './dto/update-job_role.dto';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('job-role')
+@UseGuards(JwtAuthGuard)
 export class JobRoleController {
 
   constructor(private jobRoleService: JobRoleService) {}

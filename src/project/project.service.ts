@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Project } from './entities/project.entity';
 import { Repository } from 'typeorm';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProjectService {
@@ -35,7 +36,7 @@ export class ProjectService {
       }
 
       const newProject = this.projectRepository.create({
-        ...createProjectDto
+        ...createProjectDto, createdBy: {user_id: createProjectDto.createdBy} as User
       });
 
       return this.projectRepository.save(newProject);
@@ -125,7 +126,7 @@ export class ProjectService {
         ...project,
         ...updateProjectDetails,
         deliveryManager: deliveryManager,
-        projectManager: projectManager,
+        projectManager: projectManager, createdBy: {user_id: updateProjectDetails.createdBy} as User
       };
 
       await this.projectRepository.save(updatedProjectData);

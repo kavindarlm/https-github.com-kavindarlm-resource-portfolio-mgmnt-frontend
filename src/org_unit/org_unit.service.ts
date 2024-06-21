@@ -31,9 +31,17 @@ export class OrgUnitService {
     );
   }
 
+  async hasChildUnits(unitId: number): Promise<boolean> {
+    const childUnits = await this.orgUnitRepository.find({
+      where: { parentId: unitId },
+    });
+    return childUnits.length > 0;
+  }
+
   deleteOrgUnit(unitId: number) {
     return this.orgUnitRepository.delete({ unitId });
   }
+  
 
   async getUnitById(unitId: number): Promise<OrgUnit | undefined> {
     return this.orgUnitRepository.findOne({
@@ -69,37 +77,6 @@ export class OrgUnitService {
     });
     return result;
   }
-
-  //To get the ancestors
-
-  // async getAncestors(unitId: number): Promise<OrgUnit[]> {
-  //   const ancestors: OrgUnit[] = [];
-  //   let currentUnit = await this.getUnitById(unitId);
-
-  //   while (currentUnit && currentUnit.parent) {
-  //     ancestors.unshift(currentUnit.parent);
-  //     currentUnit = await this.getUnitById(currentUnit.parent.unitId);
-  //   }
-  //   return ancestors;
-  // }
-
-  ////no errors but no output
-  // async getAncestors(unitId: number): Promise<OrgUnit[]> {
-  //   const ancestors: any[] = [];
-  //   let currentUnit = await this.orgUnitRepository.findOne({
-  //     where: { unitId },
-  //     relations: ['parent'],
-  //   });
-
-  //   while (currentUnit && currentUnit.parent) {
-  //     currentUnit = await this.orgUnitRepository.findOne({
-  //       where: { unitId: currentUnit.parent.unitId },
-  //       relations: ['parent'],
-  //     });
-  //     ancestors.unshift(currentUnit);
-  //   }
-  //   return ancestors;
-  // }
 
   async getAncestors(unitId: number): Promise<OrgUnit[]> {
     const ancestors: OrgUnit[] = [];

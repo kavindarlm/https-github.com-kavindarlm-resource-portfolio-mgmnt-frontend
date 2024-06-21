@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from './entities/resource.entity';
+import { ResourceWithInitials } from './resource.service';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('resource')
+@UseGuards(JwtAuthGuard)
 export class ResourceController {
   constructor(private resourceService: ResourceService) { }
 
@@ -40,10 +43,14 @@ export class ResourceController {
     return this.resourceService.getResourcesByTeamId(teamId, jobRole, orgUnit);
   }
 
+  // @Get('holiday/:resourceId')
+  // getResourceById(@Param('resourceId') resourceId: string): Promise<Resource> {
+  //   return this.resourceService.getResourceById(resourceId);
+  // }
   @Get('holiday/:resourceId')
-  getResourceById(@Param('resourceId') resourceId: string): Promise<Resource> {
-    return this.resourceService.getResourceById(resourceId);
-  }
+getResourceById(@Param('resourceId') resourceId: string): Promise<ResourceWithInitials> {
+  return this.resourceService.getResourceById(resourceId);
+}
 
   @Get()
   getResources() {

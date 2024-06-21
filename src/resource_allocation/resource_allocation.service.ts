@@ -54,7 +54,7 @@ export class ResourceAllocationService {
   }
 
 
-  async getTasksByResourceId(resourceId: string): Promise<{ task: Task, resourceAllocation: ResourceAllocation }[]> {
+  async getTasksByResourceId(resourceId: string): Promise<{ resourceAllocation: ResourceAllocation }[]> {
     // Fetching resource allocations with related task data based on the provided resourceId
     const resourceAllocations = await this.resourceAllocationRepository.find({
       where: { resource: { resourceId: resourceId } },
@@ -63,7 +63,7 @@ export class ResourceAllocationService {
 
     // Return an array of objects containing both task and resource allocation details
     return resourceAllocations.map(resourceAllocation => ({
-      task: resourceAllocation.task, // task details
+      // task: resourceAllocation.task, // task details
       resourceAllocation: resourceAllocation, // resource allocation details
     }));
   }
@@ -91,6 +91,34 @@ export class ResourceAllocationService {
       throw new Error('Unable to delete resource allocation row.');
     }
   }
+
+  // Method to delete all resource allocations by sprint ID
+  async deleteResourceAllocationsBySprintId(sprintId: number): Promise<void> {
+    try {
+        // Query the database to find resource allocations by sprint ID
+        const resourceAllocations = await this.resourceAllocationRepository.find({
+            where: { sprint: { sprint_id: sprintId } },
+        });
+
+        // Check if any resource allocations were found
+        if (resourceAllocations.length === 0) {
+            console.log(`No resource allocations found for sprint ID ${sprintId}`);
+            // Optionally, you can throw a custom error or log a message indicating no resource allocations found
+            return; // Exit the method since there are no resource allocations to delete
+        }
+
+        // Delete each resource allocation found for the sprint ID
+        await Promise.all(resourceAllocations.map(async allocation => {
+            await this.resourceAllocationRepository.remove(allocation);
+        }));
+
+        console.log(`Resource allocations for sprint ID ${sprintId} deleted successfully.`);
+    } catch (error) {
+        console.error(`Error deleting resource allocations for sprint ID ${sprintId}:`, error);
+        throw new HttpException('Unable to delete resource allocations by sprint ID.', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+
 
   async updateResourceAllocation(id: number, updateResourceAllocationDto: UpdateResourceAllocationDto): Promise<ResourceAllocation> {
     try {
