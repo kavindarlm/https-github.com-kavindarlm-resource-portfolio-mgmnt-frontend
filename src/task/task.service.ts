@@ -113,11 +113,11 @@ export class TaskService {
                 throw new NotFoundException(`Task with ID ${taskid} not found`);
             }
             Object.assign(task, updateTaskDetails);
-            task.createdBy = { user_id: updateTaskDetails.createdBy } as User; // Update the userId
+            task.updatedBy = { user_id: updateTaskDetails.updatedBy } as User; // Update the userId
             return await this.taskRepository.save(task);
         } catch (error) {
             throw new NotFoundException('Could not update task');
-        }
+        }   
     }
 
     //service to get the sum of allocation percetage of tasks by project ID

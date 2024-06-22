@@ -9,7 +9,6 @@ import {
   ParseIntPipe,
   BadRequestException,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
@@ -19,7 +18,7 @@ import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 import { Request } from 'express';
 import { Resource } from 'src/resource/entities/resource.entity';
 import { GetUser } from 'src/Auth/get-user.decorator';
-import { User } from 'src/user/entities/user.entity';
+
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('task')
@@ -85,7 +84,7 @@ export class TaskController {
     @Body() updateTaskDto: updateTaskDetailsDto,
     @GetUser() user: any,
   ){ 
-    updateTaskDto.createdBy = user.id;
+    updateTaskDto.updatedBy = user.id;
     await this.taskService.updateTaskDetails(taskId, updateTaskDto);
   } 
  

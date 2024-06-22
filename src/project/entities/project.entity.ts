@@ -52,4 +52,8 @@ export class Project {
     @ManyToOne(() => User)
     @JoinColumn({ name: 'created_by'})
     createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'updated_by'})
+    updatedBy: User;
 }

@@ -1,5 +1,6 @@
 import { Resource } from "src/resource/entities/resource.entity";
-import { Column, Entity, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany,  PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'job_role'})
 export class JobRole {
@@ -13,4 +14,12 @@ export class JobRole {
 
     @OneToMany(() => Resource, resource => resource.job_role)
     resources: Resource[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({name: 'created_by'})
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({name: 'updated_by'})
+    updatedBy: User;
 }
