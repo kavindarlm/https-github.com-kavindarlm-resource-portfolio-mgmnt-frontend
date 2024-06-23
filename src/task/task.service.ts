@@ -202,4 +202,26 @@ export class TaskService {
 
         return Array.from(uniqueResourcesMap.values());
     }
+
+
+    async getNotCompletedProjectCount(): Promise<number> {
+        try {
+            // Get all projects
+            const projects = await this.projectRepository.find();
+
+            let notCompletedProjectCount = 0;
+
+            // Calculate the progress for each project and count the ones with progress < 100
+            for (const project of projects) {
+                const progress = await this.getProjectProgressByProjectId(project.projectid);
+                if (progress < 100) {
+                    notCompletedProjectCount++;
+                }
+            }
+
+            return notCompletedProjectCount;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to get the count of not completed projects');
+        }
+    }
 }

@@ -24,6 +24,6 @@ export class Holiday {
     createdBy: User;
 
     @ManyToOne(() => User)
-    @JoinColumn({ name: 'updated_by' })
+    @JoinColumn({ name: 'last_updated_by' })
     updatedBy: User;
 }

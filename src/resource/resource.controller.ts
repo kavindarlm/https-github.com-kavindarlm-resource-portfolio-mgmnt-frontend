@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, Query, UseGuards, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, UseGuards } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
@@ -94,11 +94,7 @@ getResourceById(@Param('resourceId') resourceId: string): Promise<ResourceWithIn
   //Count resources
   @Get('countresources/resourcecount')
   async countResources() {
-    const count = await this.resourceService.countResources();
-    if (count === undefined) {
-      throw new NotFoundException('Resources not found.');
-    }
-    return { count };
+    return await this.resourceService.countResources();
   }
 
 }

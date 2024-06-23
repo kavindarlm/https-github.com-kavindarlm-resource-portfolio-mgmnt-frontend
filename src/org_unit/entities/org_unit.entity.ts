@@ -35,7 +35,7 @@ export class OrgUnit {
     createdBy: User;
 
     @ManyToOne(() => User)
-    @JoinColumn({ name: 'updatedBy' })
+    @JoinColumn({ name: 'last_updatedBy' })
     updatedBy: User;
 
 }

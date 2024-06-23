@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Sprint } from './entities/sprint.entity';
 import { CreateSprintDto } from './dto/create-sprint.dto';
 import { UpdateSprintDto } from './dto/update-sprint.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class SprintService {
@@ -28,7 +29,7 @@ export class SprintService {
 
   async create(createSprintDto: CreateSprintDto): Promise<Sprint> {
     // Create a new Sprint instance using the DTO
-    const sprint = this.sprintRepository.create(createSprintDto);
+    const sprint = this.sprintRepository.create({...createSprintDto, createdBy: {user_id: createSprintDto.createdBy} as User});
 
     // Set the createdAt date to today's date
     sprint.createdAt = new Date();
@@ -55,6 +56,8 @@ export class SprintService {
 
     // Update the sprint's properties
     Object.assign(sprint, updateSprintDto);
+
+    sprint.updatedBy = {user_id: updateSprintDto.updatedBy} as User;
 
     // Save the updated sprint to the database
     return this.sprintRepository.save(sprint);

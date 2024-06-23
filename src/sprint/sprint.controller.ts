@@ -4,6 +4,7 @@ import { CreateSprintDto } from './dto/create-sprint.dto';
 import { Sprint } from './entities/sprint.entity';
 import { UpdateSprintDto } from './dto/update-sprint.dto';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 @Controller('sprint')
 @UseGuards(JwtAuthGuard)
@@ -25,7 +26,8 @@ export class SprintController {
   }
 
   @Post()
-  async create(@Body() createSprintDto: CreateSprintDto) {
+  async create(@Body() createSprintDto: CreateSprintDto, @GetUser() user: any) {
+    createSprintDto.createdBy = user.id;
     return await this.sprintService.create(createSprintDto);
   }
 
@@ -42,8 +44,10 @@ export class SprintController {
   @Put(':sprint_id')
   async update(
     @Param('sprint_id') sprintId: number,
-    @Body() updateSprintDto: UpdateSprintDto
+    @Body() updateSprintDto: UpdateSprintDto,
+    @GetUser() user:  any,
   ): Promise<Sprint> {
+    updateSprintDto.updatedBy = user.id;
     return this.sprintService.update(sprintId, updateSprintDto);
   }
 

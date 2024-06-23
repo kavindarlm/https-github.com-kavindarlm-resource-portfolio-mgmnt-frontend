@@ -115,5 +115,11 @@ export class TaskController {
   async getResourcesByProjectId(@Param('projectId') projectId: number): Promise<Resource[]> {
     return this.taskService.getResourcesByProjectId(projectId);
   }
+
+  @Get('/projects/not-completed/count')
+    async getNotCompletedProjectCount() {
+        return await this.taskService.getNotCompletedProjectCount();
+    }
+
 }
  
