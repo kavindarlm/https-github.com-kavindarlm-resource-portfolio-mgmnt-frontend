@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTeamDto, CreateTeamParams, UpdateTeamParams } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
+import {  Injectable, NotFoundException } from '@nestjs/common';
+import {  CreateTeamParams } from './dto/create-team.dto';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Team } from './entities/team.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TeamService {
@@ -14,39 +14,42 @@ export class TeamService {
   constructor(
     @InjectRepository(Team) private readonly teamRepository: Repository<Team>,
     @InjectRepository(Resource) private readonly resourceRepository: Repository<Resource>,
-    @InjectEntityManager() private entityManager: EntityManager){}
+    @InjectRepository(User) private userRepository: Repository<User>,
+    @InjectEntityManager() private entityManager: EntityManager) { }
 
-    async getTeams(): Promise<Team[]> {
-      return this.teamRepository.find();
-    }
-
-    
- //method to get all teams
-  findTeams() {
-    //get all the team records from the teams table
+  async getTeams(): Promise<Team[]> {
     return this.teamRepository.find();
-    //{relations:['profile']}- to get the profile details of the user
-    //{relations:['posts']}- to get the post details of the user
   }
 
+
+  //method to get all teams
+  findTeams() {
+    //get all the team records from the teams table
+    return this.teamRepository.find({
+      order: {
+        createdAt: 'DESC'
+      }
+    });
+  }
+  
   //method to create team by updating teamid column in resource table
   async createTeamAndAssignResources(createTeamParams: CreateTeamParams): Promise<Team | null> {
     const { teamName, team_description, resourceIds } = createTeamParams;
-  
+
     // Check if any of the required parameters are null
     if (!teamName || !team_description || !resourceIds || resourceIds.length === 0) {
       // You can either return null or throw an error
       return null;
       // throw new Error('Invalid parameters');
     }
-  
+
     // Map 'teamName' to 'team_Name'
     const team_Name = teamName;
-  
+
     // Create a new team
-    const team = this.teamRepository.create({ team_Name, team_description });
+    const team = this.teamRepository.create({ team_Name, team_description, createdBy: {user_id: createTeamParams.createdBy} as User });
     await this.teamRepository.save(team);
-  
+
     // Assign resources to the team
     for (const resourceId of resourceIds) {
       const resource = await this.resourceRepository.findOne({ where: { resourceId: resourceId } });
@@ -55,17 +58,17 @@ export class TeamService {
         await this.resourceRepository.save(resource);
       }
     }
-  
+
     return team;
   }
 
   // Method to get a team by ID
   async getTeamById(id: number): Promise<Team> {
-    const team = await this.teamRepository.findOne({ 
-      where: { teamId: id }, 
-      relations: ['resources', 'resources.org_unit', 'resources.job_role'] 
+    const team = await this.teamRepository.findOne({
+      where: { teamId: id },
+      relations: ['resources', 'resources.org_unit', 'resources.job_role']
     });
-  
+
     if (team) {
       team.resources = team.resources.map(resource => ({
         ...resource,
@@ -73,7 +76,7 @@ export class TeamService {
         unitName: resource.org_unit.unitName
       }));
     }
-  
+
     return team;
   }
 
@@ -91,27 +94,27 @@ export class TeamService {
   //method to delete team by id
   async deleteTeamById(id: number): Promise<void> {
     await this.entityManager.transaction(async transactionalEntityManager => {
-        // reassign all resources associated with the team to null
-        await transactionalEntityManager
-            .createQueryBuilder()
-            .update(Resource)
-            .set({ teamId: null })
-            .where("teamId = :id", { id })
-            .execute();
+      // reassign all resources associated with the team to null
+      await transactionalEntityManager
+        .createQueryBuilder()
+        .update(Resource)
+        .set({ teamId: null })
+        .where("teamId = :id", { id })
+        .execute();
 
-        //delete the team
-        const result = await transactionalEntityManager
-            .createQueryBuilder()
-            .delete()
-            .from(Team)
-            .where("teamId = :id", { id })
-            .execute();
+      //delete the team
+      const result = await transactionalEntityManager
+        .createQueryBuilder()
+        .delete()
+        .from(Team)
+        .where("teamId = :id", { id })
+        .execute();
 
-        if (result.affected === 0) {
-            throw new NotFoundException(`Team with ID ${id} not found`);
-        }
+      if (result.affected === 0) {
+        throw new NotFoundException(`Team with ID ${id} not found`);
+      }
     });
-}
+  }
 
 
 

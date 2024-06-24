@@ -1,9 +1,11 @@
-import { Controller, Get} from '@nestjs/common';
+import { Controller, Get, UseGuards} from '@nestjs/common';
 import { CriticalityService } from './criticality.service';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 // import { CreateCriticalityDto } from './dto/create-criticality.dto';
 // import { UpdateCriticalityDto } from './dto/update-criticality.dto';
 
 @Controller('criticality')
+@UseGuards(JwtAuthGuard)
 export class CriticalityController {
   constructor(private readonly criticalityService: CriticalityService) {}
 

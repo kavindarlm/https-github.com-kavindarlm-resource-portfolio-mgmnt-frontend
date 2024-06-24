@@ -3,26 +3,29 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
   ParseIntPipe,
   BadRequestException,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrgUnitService } from './org_unit.service';
 import { CreateOrgUnitDto } from './dto/create-org_unit.dto';
 import { UpdateOrgUnitDto } from './dto/update-org_unit.dto';
-import { relative } from 'path/win32';
 import { OrgUnit } from './entities/org_unit.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 @Controller('org-unit')
+@UseGuards(JwtAuthGuard)
 export class OrgUnitController {
   constructor(private orgUnitService: OrgUnitService) { }
 
   @Post()
-  createOrgUnit(@Body() createOrgUnitDto: CreateOrgUnitDto) {
+  createOrgUnit(@Body() createOrgUnitDto: CreateOrgUnitDto, @GetUser() user: any) {
+    createOrgUnitDto.createdBy = user.id;
     return this.orgUnitService.createOrgUnit(createOrgUnitDto);
   }
 
@@ -40,7 +43,9 @@ export class OrgUnitController {
   async updateOrgUnitById(
     @Param('unitId', ParseIntPipe) unitId: number,
     @Body() updateOrgUnitDto: UpdateOrgUnitDto,
+    @GetUser() user: any,
   ) {
+    updateOrgUnitDto.updatedBy = user.id;
     await this.orgUnitService.updateOrgUnit(unitId, updateOrgUnitDto);
   }
 

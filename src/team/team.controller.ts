@@ -1,23 +1,39 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe, NotFoundException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Delete,
+  Put,
+  ParseIntPipe,
+  NotFoundException,
+  UseGuards,
+} from '@nestjs/common';
 import { TeamService } from './team.service';
 import { CreateTeamDto } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
 import { Team } from './entities/team.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 @Controller('teams')
+@UseGuards(JwtAuthGuard)
 export class TeamController {
-  constructor(private teamService: TeamService) { }
+  constructor(private teamService: TeamService) {}
 
   //get all teams
   @Get()
   async getTeams() {
     return this.teamService.findTeams();
-
   }
 
   //create a team by updating teamid column in resource table
   @Post()
-  async createTeamAndAssignResources(@Body() formData: CreateTeamDto): Promise<Team> {
+  async createTeamAndAssignResources(
+    @Body() formData: CreateTeamDto,
+    @GetUser() user: any,
+  ): Promise<Team> {
+    formData.createdBy = user.id;
     return this.teamService.createTeamAndAssignResources(formData);
   }
 
@@ -33,7 +49,12 @@ export class TeamController {
 
   //update teams
   @Put(':id')
-  async updateTeam(@Param('id') id: string, @Body() updatedTeam: Partial<Team>): Promise<Team> {
+  async updateTeam(
+    @Param('id') id: string,
+    @Body() updatedTeam: Partial<Team>,
+    @GetUser() user: any,
+  ): Promise<Team> {
+    updatedTeam.updatedBy = user.id;
     return this.teamService.updateTeam(id, updatedTeam);
   }
 
@@ -41,6 +62,5 @@ export class TeamController {
   @Delete(':id')
   deleteTeam(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.teamService.deleteTeamById(id);
-}
-
+  }
 }

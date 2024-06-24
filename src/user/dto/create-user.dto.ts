@@ -15,4 +15,6 @@ export class CreateUserDto {
 
     password?: string;
 
+    created_by: number;
+
 }
