@@ -14,7 +14,7 @@ export class UserService {
   private userRepo: Repository<User>) { }
 
   async create(createUserDto: CreateUserDto) {
-    const existingUser = await this.userRepo.findOne({ where: { user_email: createUserDto.user_email } });
+    const existingUser = await this.userRepo.findOne({ where: { user_email: createUserDto.user_email , deleted: false  } });
     if (existingUser) {
       throw new BadRequestException('Email already exists');
     }
@@ -23,17 +23,17 @@ export class UserService {
   }
 
   findAll() {
-    const allusers = this.userRepo.find();
-    return allusers;
+    const allUsers = this.userRepo.find({ where: { deleted: false } });
+    return allUsers;
   }
 
   async findAllUsers() {
-    const users = await this.userRepo.find({ where: { user_role: 'user' } });
+    const users = await this.userRepo.find({ where: { user_role: 'user', deleted: false } });
     return users;
   }
   
   async findAllAdmins() {
-    const admins = await this.userRepo.find({ where: { user_role: 'admin' } });
+    const admins = await this.userRepo.find({ where: { user_role: 'admin', deleted: false } });
     return admins;
   }
 
@@ -53,6 +53,10 @@ export class UserService {
 
   deleteUserById(id: number) {
     return this.userRepo.delete(id);
+  }
+
+  async markUserAsDeletedById(id: number): Promise<any> {
+    return this.userRepo.update(id, { deleted: true });
   }
 
   async searchUser(alias: string) {

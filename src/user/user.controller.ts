@@ -79,7 +79,7 @@ export class UserController {
     console.log('Incoming Login Request');
     const user = await this.userService.findLoginUser({ where: { user_email: createUserDto.user_email } });
 
-    if (!user) {
+    if (!user || user.deleted) {
       throw new BadRequestException('Invalid credentials');
     }
 
@@ -211,7 +211,7 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     await this.usersFunctionService.deleteUserFunction(id);
-    return this.userService.deleteUserById(id);
+    return this.userService.markUserAsDeletedById(id); 
   }
 
   // controller for searching users by user name
