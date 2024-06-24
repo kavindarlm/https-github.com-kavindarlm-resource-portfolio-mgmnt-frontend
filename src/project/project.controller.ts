@@ -63,7 +63,7 @@ export class ProjectController {
     @GetUser() user: any,
   ): Promise<Project> {
     try {
-      updateProjectDto.createdBy = user.id;
+      updateProjectDto.updatedBy = user.id;
       return await this.projectService.updateProject(id, updateProjectDto);
     } catch (error) {
       throw new BadRequestException(error.message);

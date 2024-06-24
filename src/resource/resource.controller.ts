@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Put, ParseIntPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, Query, UseGuards } from '@nestjs/common';
 import { ResourceService } from './resource.service';
 import { CreateResourceDto } from './dto/create-resource.dto';
 import { UpdateResourceDto } from './dto/update-resource.dto';
-import { Resource } from './entities/resource.entity';
 import { ResourceWithInitials } from './resource.service';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 @Controller('resource')
 @UseGuards(JwtAuthGuard)
@@ -75,18 +75,26 @@ getResourceById(@Param('resourceId') resourceId: string): Promise<ResourceWithIn
   }
 
   @Post()
-  createResource(@Body() createResourceDto: CreateResourceDto) {
+  createResource(@Body() createResourceDto: CreateResourceDto, @GetUser() user: any) {
+    createResourceDto.createdBy = user.id;
     return this.resourceService.createResource(createResourceDto);
   }
 
   @Put(':resourceId')
-  async updateResourceById(@Param('resourceId') resourceId: string, @Body() updateResourceDto: UpdateResourceDto,) {
+  async updateResourceById(@Param('resourceId') resourceId: string, @Body() updateResourceDto: UpdateResourceDto, @GetUser() user: any) {
+    updateResourceDto.updatedBy = user.id;
     await this.resourceService.updateResource(resourceId, updateResourceDto);
   }
 
   @Delete(':resourceId')
   async deleteResourceById(@Param('resourceId') resourceId: string) {
     await this.resourceService.deleteResource(resourceId);
+  }
+
+  //Count resources
+  @Get('countresources/resourcecount')
+  async countResources() {
+    return await this.resourceService.countResources();
   }
 
 }

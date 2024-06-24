@@ -1,5 +1,4 @@
-import { PartialType } from '@nestjs/mapped-types';
-import { CreateResourceDto } from './create-resource.dto';
+
 
 export class UpdateResourceDto {
     resourceName: string;
@@ -7,6 +6,7 @@ export class UpdateResourceDto {
     roleId: number;
     unitId: number;
     teamId: number;
+    updatedBy: number;
 }
 
 export type UpdateResourceParams = {
@@ -15,4 +15,5 @@ export type UpdateResourceParams = {
     roleId: number;
     unitId: number;
     teamId: number;
+    updatedBy: number;
 };

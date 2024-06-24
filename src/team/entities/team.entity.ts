@@ -1,5 +1,6 @@
 import { Resource } from "src/resource/entities/resource.entity";
-import { Column, CreateDateColumn, Entity,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, CreateDateColumn, Entity,  JoinColumn,  ManyToOne,  OneToMany,  PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'teams' })
 export class Team {
@@ -17,4 +18,12 @@ export class Team {
 
     @OneToMany(() => Resource, resource => resource.teams)
     resources: Resource[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updated_by' })
+    updatedBy: User;
 }

@@ -9,5 +9,5 @@ export class updateTaskDetailsDto{
     taskDescription: string; 
     taskAllocationPercentage: number;
     taskProgressPercentage: number;
-    createdBy: number;
+    updatedBy: number;
 }

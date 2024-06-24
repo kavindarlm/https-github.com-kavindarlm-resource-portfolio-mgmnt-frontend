@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'sprint'})
 export class Sprint {
@@ -16,4 +17,13 @@ export class Sprint {
 
     @Column()
     createdAt: Date;
+
+    @ManyToOne(() => User)
+    @JoinColumn({name: 'createdBy'})
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({name: 'last_updatedBy'})
+    updatedBy: User;
+
 }
