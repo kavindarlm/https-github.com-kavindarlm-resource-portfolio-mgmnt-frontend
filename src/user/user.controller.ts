@@ -11,6 +11,7 @@ import { UsersFunctionService } from '../users_function/users_function.service';
 import * as nodemailer from 'nodemailer';
 import { NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -34,9 +35,11 @@ export class UserController {
 
   @Post('register')
   @UsePipes(ValidationPipe)
-  async register(@Body() createUserDto: CreateUserDto & { password: string }) {
+  async register(@Body() createUserDto: CreateUserDto & { password: string }, @GetUser() users: any) {
     let password = generatePassword(8, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
     createUserDto.password = password;
+     createUserDto.created_by = users.id;
+     console.log(createUserDto);
     if (!createUserDto.password) {
       throw new BadRequestException('Password is required');
     }

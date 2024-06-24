@@ -18,7 +18,8 @@ export class UserService {
     if (existingUser) {
       throw new BadRequestException('Email already exists');
     }
-    const user = this.userRepo.create(createUserDto);
+    const user = this.userRepo.create({...createUserDto, createdBy: { user_id: createUserDto.created_by} as User
+    });
     return this.userRepo.save(user);
   }
 
