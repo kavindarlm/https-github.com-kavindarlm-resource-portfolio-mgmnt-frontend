@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Task } from './entities/task.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +7,7 @@ import { createTaskDto } from './dto/createTask.dto';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 import { ResourceAllocation } from 'src/resource_allocation/entities/resource_allocation.entity';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TaskService {
@@ -53,11 +54,10 @@ export class TaskService {
             //     throw new BadRequestException('Adding this task will reach 100% allocation for this project');
             // }
 
-            const newTask = this.taskRepository.create({ ...createTaskDetails, project });
+            const newTask = this.taskRepository.create({ ...createTaskDetails, project, createdBy: {user_id : createTaskDetails.createdBy} as User, createdTime: new Date() });
             return await this.taskRepository.save(newTask);
         } catch (error) {
-            throw new NotFoundException('Could not create task');
-            // return { error: error.message };
+            throw new InternalServerErrorException(`Failed to create task: ${error.message}`);
         }
     }
 
@@ -72,7 +72,7 @@ export class TaskService {
         } catch (error) {
             throw new NotFoundException('Could not find task');
         }
-    }
+    } 
 
     //service for updating task Progress
     async updateTask(taskid: string, updateTaskDetails: updateTaskDto) {
@@ -106,12 +106,18 @@ export class TaskService {
     }
 
     //service for update task Details
-    async updateTaskDetails(taskid: string, updateTaskDetails: updateTaskDetailsDto) {
+    async updateTaskDetails(taskid: number, updateTaskDetails: updateTaskDetailsDto) {
         try {
-            return await this.taskRepository.update(taskid, updateTaskDetails);
+            const task = await this.taskRepository.findOne({ where: { taskid: taskid } });
+            if (!task) {
+                throw new NotFoundException(`Task with ID ${taskid} not found`);
+            }
+            Object.assign(task, updateTaskDetails);
+            task.updatedBy = { user_id: updateTaskDetails.updatedBy } as User; // Update the userId
+            return await this.taskRepository.save(task);
         } catch (error) {
-            throw new NotFoundException('Could not update task details');
-        }
+            throw new NotFoundException('Could not update task');
+        }   
     }
 
     //service to get the sum of allocation percetage of tasks by project ID
@@ -198,4 +204,24 @@ export class TaskService {
     }
 
 
+    async getNotCompletedProjectCount(): Promise<number> {
+        try {
+            // Get all projects
+            const projects = await this.projectRepository.find();
+
+            let notCompletedProjectCount = 0;
+
+            // Calculate the progress for each project and count the ones with progress < 100
+            for (const project of projects) {
+                const progress = await this.getProjectProgressByProjectId(project.projectid);
+                if (progress < 100) {
+                    notCompletedProjectCount++;
+                }
+            }
+
+            return notCompletedProjectCount;
+        } catch (error) {
+            throw new InternalServerErrorException('Failed to get the count of not completed projects');
+        }
+    }
 }

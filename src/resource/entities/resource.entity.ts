@@ -3,7 +3,8 @@ import { OrgUnit } from "src/org_unit/entities/org_unit.entity";
 import { Project } from "src/project/entities/project.entity";
 import { ResourceHoliday } from "src/resource_holiday/entities/resource_holiday.entity";
 import { Team } from "src/team/entities/team.entity";
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryColumn } from "typeorm";
 
 @Entity()
 export class Resource {
@@ -46,5 +47,13 @@ export class Resource {
    
     @OneToMany(() => Project, project => project.projectManager)
     projectss: Project[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'createdBy' })
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updatedBy' })
+    updatedBy: User;
 
 }

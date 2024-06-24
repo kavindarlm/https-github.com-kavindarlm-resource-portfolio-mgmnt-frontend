@@ -5,4 +5,5 @@ export class createTaskDto{
     exEndDate: string;
     taskDescription: string; 
     taskAllocationPercentage: number;
+    createdBy: number;
 }

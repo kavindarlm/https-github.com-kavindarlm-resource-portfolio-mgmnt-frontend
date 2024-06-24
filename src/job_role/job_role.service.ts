@@ -1,12 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { CreateJobRoleDto } from './dto/create-job_role.dto';
-import { UpdateJobRoleDto } from './dto/update-job_role.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { JobRole } from './entities/job_role.entity';
 import { Repository } from 'typeorm';
 // import { CreateJobRoleParams, UpdateJobRoleParams } from 'src/utils/types';
 import { CreateJobRoleParams } from './dto/create-job_role.dto';
 import { UpdateJobRoleParams } from './dto/update-job_role.dto';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class JobRoleService {
@@ -21,12 +20,12 @@ export class JobRoleService {
   }
 
   createJobRole(jobRoleDetails: CreateJobRoleParams) {
-    const newJobRole = this.jobRoleRepository.create({...jobRoleDetails});
+    const newJobRole = this.jobRoleRepository.create({...jobRoleDetails, createdBy: { user_id: jobRoleDetails.createdBy} as User});
     return this.jobRoleRepository.save(newJobRole);
   }
 
   updateJobRole(roleId: number, updateJobRoleDetails: UpdateJobRoleParams) {
-    this.jobRoleRepository.update({roleId}, {...updateJobRoleDetails});
+    this.jobRoleRepository.update({roleId}, {...updateJobRoleDetails, updatedBy: { user_id: updateJobRoleDetails.updatedBy} as User});
   }
 
   deleteJobRole(roleId: number){
