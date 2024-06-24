@@ -3,24 +3,29 @@ import {
   Get,
   Post,
   Body,
-  Patch,
   Param,
   Delete,
   Put,
   ParseIntPipe,
+  BadRequestException,
+  NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import { OrgUnitService } from './org_unit.service';
 import { CreateOrgUnitDto } from './dto/create-org_unit.dto';
 import { UpdateOrgUnitDto } from './dto/update-org_unit.dto';
-import { relative } from 'path/win32';
 import { OrgUnit } from './entities/org_unit.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 @Controller('org-unit')
+@UseGuards(JwtAuthGuard)
 export class OrgUnitController {
-  constructor(private orgUnitService: OrgUnitService) {}
+  constructor(private orgUnitService: OrgUnitService) { }
 
   @Post()
-  createOrgUnit(@Body() createOrgUnitDto: CreateOrgUnitDto) {
+  createOrgUnit(@Body() createOrgUnitDto: CreateOrgUnitDto, @GetUser() user: any) {
+    createOrgUnitDto.createdBy = user.id;
     return this.orgUnitService.createOrgUnit(createOrgUnitDto);
   }
 
@@ -30,38 +35,46 @@ export class OrgUnitController {
   }
 
   @Get(':unitId')
-  async getUnitNameById(@Param('unitId') unitId: number) {
-    return this.orgUnitService.getUnitNameById(unitId);
+  async getUnitById(@Param('unitId') unitId: number) {
+    return this.orgUnitService.getUnitById(unitId);
   }
 
   @Put(':unitId')
   async updateOrgUnitById(
     @Param('unitId', ParseIntPipe) unitId: number,
     @Body() updateOrgUnitDto: UpdateOrgUnitDto,
+    @GetUser() user: any,
   ) {
+    updateOrgUnitDto.updatedBy = user.id;
     await this.orgUnitService.updateOrgUnit(unitId, updateOrgUnitDto);
   }
 
   @Delete(':unitId')
   async deleteOrgUnitById(@Param('unitId', ParseIntPipe) unitId: number) {
-    await this.orgUnitService.deleteOrgUnit(unitId);
+    const hasChildren = await this.orgUnitService.hasChildUnits(unitId);
+    if (hasChildren) {
+      throw new BadRequestException("If you want to delete this unit, you should edit or delete its child units first.");
+    }
+    const result = await this.orgUnitService.deleteOrgUnit(unitId);
+    if (result.affected === 0) {
+      throw new NotFoundException("Unit not found or already deleted.");
+    }
+    return { message: 'Unit deleted successfully.' };
   }
+
+
+  @Get(':unitId/has-children')
+  async hasChildUnits(@Param('unitId', ParseIntPipe) unitId: number) {
+    const hasChildren = await this.orgUnitService.hasChildUnits(unitId);
+    return hasChildren;
+  }
+
 
   @Get('hierarchy/data')
   async getOrgUnitHierarchy(): Promise<any> {
     return this.orgUnitService.getOrgUnitHierarchy();
     // return "Hierarchy";
   }
-
-  //To get ancestors
-  // @Get(':unitId/ancestors')
-  // async getAncestors(@Param('unitId', ParseIntPipe) unitId: number) {
-  //   const ancestors = await this.orgUnitService.getAncestors(unitId);
-  //   if (!ancestors || ancestors.length === 0) {
-  //     return { message: 'No ancestors found' };
-  //   }
-  //   return ancestors;
-  // }
 
   @Get('ancestors/parents/:unitId')
   async getAncestors(

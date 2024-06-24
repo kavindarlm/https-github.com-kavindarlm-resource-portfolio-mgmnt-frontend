@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { UsersFunction } from 'src/users_function/entities/users_function.entity';
 
 
@@ -24,4 +24,17 @@ export class User {
 
     @OneToMany(() => UsersFunction, usersFunction => usersFunction.user)
     usersFunctions: UsersFunction[];
+
+    // Added deleted flag column
+    @Column({ default: false })
+    deleted: boolean;
+
+    // New relationship to track who created the user
+    @ManyToOne(() => User, user => user.createdUsers)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: User;
+
+    @OneToMany(() => User, user => user.createdBy)
+    createdUsers:User[];
+
 }

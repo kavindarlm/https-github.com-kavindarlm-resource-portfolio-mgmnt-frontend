@@ -10,14 +10,18 @@ import {
   NotFoundException,
   BadRequestException,
   ParseIntPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { ProjectService } from './project.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { Project } from './entities/project.entity';
 import { Request } from 'express';
+import { GetUser } from 'src/Auth/get-user.decorator';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('project')
+@UseGuards(JwtAuthGuard)
 export class ProjectController {
   constructor(private readonly projectService: ProjectService) { }
 
@@ -29,15 +33,17 @@ export class ProjectController {
 
   //controller for creating a project
   @Post()
-  async createProject(@Body() createProjectDtoo: CreateProjectDto) {
+  async createProject(@Body() createProjectDtoo: CreateProjectDto, @GetUser() user: any) {
     try {
+      createProjectDtoo.createdBy = user.id;
       const project = this.projectService.createProject(createProjectDtoo);
       return project;
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw new NotFoundException('Delivery Manager or Project Manager not found');
-      }
-      else {
+        throw new NotFoundException(
+          'Delivery Manager or Project Manager not found',
+        );
+      } else {
         throw new BadRequestException('Could not create the project');
       }
     }
@@ -54,8 +60,10 @@ export class ProjectController {
   async updateProject(
     @Param('id') id: number,
     @Body() updateProjectDto: UpdateProjectDto,
+    @GetUser() user: any,
   ): Promise<Project> {
     try {
+      updateProjectDto.updatedBy = user.id;
       return await this.projectService.updateProject(id, updateProjectDto);
     } catch (error) {
       throw new BadRequestException(error.message);
@@ -95,8 +103,7 @@ export class ProjectController {
   //  controller for searching projects by project name
   @Get('searchprojectName/search')
   async searchProjects(@Req() req: Request) {
-    const builder = await this.projectService.searchProject('projects');;
-
+    const builder = await this.projectService.searchProject('projects');
     if (req.query.s) {
       builder.where('projects.projectName like :s', { s: `%${req.query.s}%` });
     }
@@ -105,7 +112,9 @@ export class ProjectController {
 
   // controller for return all the resource id and resource name
   @Get('getResoure/bynameAndId')
-  async getResourceNameAndId(): Promise<{ resourceId: string; resourceName: string }[]> {
+  async getResourceNameAndId(): Promise<
+    { resourceId: string; resourceName: string }[]
+  > {
     return this.projectService.getResourceNameAndId();
   }
 
@@ -124,7 +133,9 @@ export class ProjectController {
 
   // controller for getting project name and project ID by task ID
   @Get('getProjectByCriticalityId/:criticalityId')
-  async getProjectsByCriticality(@Param('criticalityId', ParseIntPipe) criticalityId: number): Promise<Partial<Project>[]> {
+  async getProjectsByCriticality(
+    @Param('criticalityId', ParseIntPipe) criticalityId: number,
+  ): Promise<Partial<Project>[]> {
     return await this.projectService.getProjectsByCriticality(criticalityId);
   }
 
@@ -137,5 +148,5 @@ export class ProjectController {
 
     return { high, low, medium };
   }
-
+  
 }
