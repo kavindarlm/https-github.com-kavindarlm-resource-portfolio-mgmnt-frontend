@@ -4,6 +4,7 @@ import { UpdateOrgUnitParams } from './dto/update-org_unit.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgUnit } from './entities/org_unit.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class OrgUnitService {
@@ -19,7 +20,7 @@ export class OrgUnitService {
     //create method is not asynchronous so don't have to await it
     const newOrgUnit = this.orgUnitRepository.create({
       ...orgUnitDetails,
-      createdAt: new Date(),
+      createdAt: new Date(),createdBy: {user_id: orgUnitDetails.createdBy} as User
     });
     return this.orgUnitRepository.save(newOrgUnit);
   }
@@ -27,13 +28,21 @@ export class OrgUnitService {
   updateOrgUnit(unitId: number, updateOrgUnitDetails: UpdateOrgUnitParams) {
     return this.orgUnitRepository.update(
       { unitId },
-      { ...updateOrgUnitDetails },
+      { ...updateOrgUnitDetails, updatedBy: {user_id: updateOrgUnitDetails.updatedBy} as User },
     );
+  }
+
+  async hasChildUnits(unitId: number): Promise<boolean> {
+    const childUnits = await this.orgUnitRepository.find({
+      where: { parentId: unitId },
+    });
+    return childUnits.length > 0;
   }
 
   deleteOrgUnit(unitId: number) {
     return this.orgUnitRepository.delete({ unitId });
   }
+  
 
   async getUnitById(unitId: number): Promise<OrgUnit | undefined> {
     return this.orgUnitRepository.findOne({
@@ -69,37 +78,6 @@ export class OrgUnitService {
     });
     return result;
   }
-
-  //To get the ancestors
-
-  // async getAncestors(unitId: number): Promise<OrgUnit[]> {
-  //   const ancestors: OrgUnit[] = [];
-  //   let currentUnit = await this.getUnitById(unitId);
-
-  //   while (currentUnit && currentUnit.parent) {
-  //     ancestors.unshift(currentUnit.parent);
-  //     currentUnit = await this.getUnitById(currentUnit.parent.unitId);
-  //   }
-  //   return ancestors;
-  // }
-
-  ////no errors but no output
-  // async getAncestors(unitId: number): Promise<OrgUnit[]> {
-  //   const ancestors: any[] = [];
-  //   let currentUnit = await this.orgUnitRepository.findOne({
-  //     where: { unitId },
-  //     relations: ['parent'],
-  //   });
-
-  //   while (currentUnit && currentUnit.parent) {
-  //     currentUnit = await this.orgUnitRepository.findOne({
-  //       where: { unitId: currentUnit.parent.unitId },
-  //       relations: ['parent'],
-  //     });
-  //     ancestors.unshift(currentUnit);
-  //   }
-  //   return ancestors;
-  // }
 
   async getAncestors(unitId: number): Promise<OrgUnit[]> {
     const ancestors: OrgUnit[] = [];

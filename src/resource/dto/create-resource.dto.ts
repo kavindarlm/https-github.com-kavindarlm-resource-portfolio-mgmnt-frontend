@@ -4,6 +4,7 @@ export class CreateResourceDto {
     roleId: number;
     unitId: number;
     teamId: number;
+    createdBy: number;
 }
 
 export type CreateResourceParams = {
@@ -12,4 +13,5 @@ export type CreateResourceParams = {
     roleId: number;
     unitId: number;
     teamId: number;
+    createdBy: number;
 };

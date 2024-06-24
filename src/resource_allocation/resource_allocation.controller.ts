@@ -1,11 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, NotFoundException, HttpException, HttpStatus, UseGuards } from '@nestjs/common';
 import { ResourceAllocationService } from './resource_allocation.service';
 import { CreateResourceAllocationDto } from './dto/create-resource_allocation.dto';
 import { UpdateResourceAllocationDto } from './dto/update-resource_allocation.dto';
 import { ResourceAllocation } from './entities/resource_allocation.entity';
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('resource-allocation')
-
+@UseGuards(JwtAuthGuard)
 export class ResourceAllocationController {
   constructor(private readonly resourceAllocationService: ResourceAllocationService) { }
 

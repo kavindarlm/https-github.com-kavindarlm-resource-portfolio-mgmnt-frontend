@@ -7,5 +7,6 @@ export class CreateProjectDto {
     projectManager_id: string;
     deliveryManager_id: string;
     projectDescription: string;
+    createdBy: number;
 }
  
