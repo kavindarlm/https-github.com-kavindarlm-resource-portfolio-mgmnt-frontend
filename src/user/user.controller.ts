@@ -11,6 +11,7 @@ import { UsersFunctionService } from '../users_function/users_function.service';
 import * as nodemailer from 'nodemailer';
 import { NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
+import { GetUser } from 'src/Auth/get-user.decorator';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -34,9 +35,11 @@ export class UserController {
 
   @Post('register')
   @UsePipes(ValidationPipe)
-  async register(@Body() createUserDto: CreateUserDto & { password: string }) {
+  async register(@Body() createUserDto: CreateUserDto & { password: string }, @GetUser() users: any) {
     let password = generatePassword(8, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
     createUserDto.password = password;
+     createUserDto.created_by = users.id;
+     console.log(createUserDto);
     if (!createUserDto.password) {
       throw new BadRequestException('Password is required');
     }
@@ -79,7 +82,7 @@ export class UserController {
     console.log('Incoming Login Request');
     const user = await this.userService.findLoginUser({ where: { user_email: createUserDto.user_email } });
 
-    if (!user) {
+    if (!user || user.deleted) {
       throw new BadRequestException('Invalid credentials');
     }
 
@@ -211,7 +214,7 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     await this.usersFunctionService.deleteUserFunction(id);
-    return this.userService.deleteUserById(id);
+    return this.userService.markUserAsDeletedById(id); 
   }
 
   // controller for searching users by user name

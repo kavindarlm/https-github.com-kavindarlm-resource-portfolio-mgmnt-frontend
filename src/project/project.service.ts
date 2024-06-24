@@ -126,7 +126,7 @@ export class ProjectService {
         ...project,
         ...updateProjectDetails,
         deliveryManager: deliveryManager,
-        projectManager: projectManager, createdBy: {user_id: updateProjectDetails.createdBy} as User
+        projectManager: projectManager, updatedBy: {user_id: updateProjectDetails.updatedBy} as User
       };
 
       await this.projectRepository.save(updatedProjectData);

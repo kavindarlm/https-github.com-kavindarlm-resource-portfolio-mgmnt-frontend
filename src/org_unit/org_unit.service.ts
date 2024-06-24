@@ -4,6 +4,7 @@ import { UpdateOrgUnitParams } from './dto/update-org_unit.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { OrgUnit } from './entities/org_unit.entity';
 import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class OrgUnitService {
@@ -19,7 +20,7 @@ export class OrgUnitService {
     //create method is not asynchronous so don't have to await it
     const newOrgUnit = this.orgUnitRepository.create({
       ...orgUnitDetails,
-      createdAt: new Date(),
+      createdAt: new Date(),createdBy: {user_id: orgUnitDetails.createdBy} as User
     });
     return this.orgUnitRepository.save(newOrgUnit);
   }
@@ -27,7 +28,7 @@ export class OrgUnitService {
   updateOrgUnit(unitId: number, updateOrgUnitDetails: UpdateOrgUnitParams) {
     return this.orgUnitRepository.update(
       { unitId },
-      { ...updateOrgUnitDetails },
+      { ...updateOrgUnitDetails, updatedBy: {user_id: updateOrgUnitDetails.updatedBy} as User },
     );
   }
 

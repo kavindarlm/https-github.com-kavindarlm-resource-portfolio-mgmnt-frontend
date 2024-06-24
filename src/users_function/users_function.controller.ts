@@ -5,6 +5,7 @@ import { UpdateUsersFunctionDto } from './dto/update-users_function.dto';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('users-function')
+@UseGuards(JwtAuthGuard)
 export class UsersFunctionController {
   constructor(private readonly usersFunctionService: UsersFunctionService) {}
 

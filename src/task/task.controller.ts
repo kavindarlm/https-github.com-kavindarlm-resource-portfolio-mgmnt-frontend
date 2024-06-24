@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Body,
   Controller,
@@ -10,7 +9,6 @@ import {
   ParseIntPipe,
   BadRequestException,
   Req,
-  UseFilters,
   UseGuards,
 } from '@nestjs/common';
 import { TaskService } from './task.service';
@@ -19,12 +17,12 @@ import { Task } from './entities/task.entity';
 import { updateTaskDetailsDto, updateTaskDto } from './dto/updateTask.dto';
 import { Request } from 'express';
 import { Resource } from 'src/resource/entities/resource.entity';
-import { AuthGuard } from '@nestjs/passport';
 import { GetUser } from 'src/Auth/get-user.decorator';
-import { User } from 'src/user/entities/user.entity';
+
+import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 
 @Controller('task')
-@UseGuards(AuthGuard('jwt'))
+@UseGuards(JwtAuthGuard)
 export class TaskController {
   constructor(private readonly taskService: TaskService) {}
 
@@ -86,7 +84,7 @@ export class TaskController {
     @Body() updateTaskDto: updateTaskDetailsDto,
     @GetUser() user: any,
   ){ 
-    updateTaskDto.createdBy = user.id;
+    updateTaskDto.updatedBy = user.id;
     await this.taskService.updateTaskDetails(taskId, updateTaskDto);
   } 
  
@@ -102,7 +100,7 @@ export class TaskController {
       return progress;
   }
 
-  //controller for search tak by name
+  //controller for search task by name
   @Get('searchtaskName/search')
   async searchTaskByName(@Req() req: Request){
     const builder = await this.taskService.searchTask('tasks');;
@@ -117,5 +115,11 @@ export class TaskController {
   async getResourcesByProjectId(@Param('projectId') projectId: number): Promise<Resource[]> {
     return this.taskService.getResourcesByProjectId(projectId);
   }
+
+  @Get('/projects/not-completed/count')
+    async getNotCompletedProjectCount() {
+        return await this.taskService.getNotCompletedProjectCount();
+    }
+
 }
  

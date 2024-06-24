@@ -3,6 +3,7 @@ export class CreateOrgUnitDto {
     unitName: string;
     description: string;
     parentId: number;
+    createdBy: number;
 }
 
 export type CreateOrgUnitParams = {
@@ -10,4 +11,5 @@ export type CreateOrgUnitParams = {
     unitName: string;
     description: string;
     parentId: number;
+    createdBy: number;
 }

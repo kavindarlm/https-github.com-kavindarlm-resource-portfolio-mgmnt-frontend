@@ -34,5 +34,9 @@ export class Task{
     
     @ManyToOne(() => User)
     @JoinColumn({ name: 'created_by'})
-    createdBy: User; 
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updated_by'})
+    updatedBy: User;
 }  
