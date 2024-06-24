@@ -2,6 +2,7 @@
 import { Criticality } from "src/criticality/entities/criticality.entity";
 import { Resource } from "src/resource/entities/resource.entity";
 import { Task } from "src/task/entities/task.entity";
+import { User } from "src/user/entities/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "projects" })
@@ -47,4 +48,12 @@ export class Project {
 
     @OneToMany(() => Task, (task) => task.project)
     tasks: Task[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'created_by'})
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updated_by'})
+    updatedBy: User;
 }

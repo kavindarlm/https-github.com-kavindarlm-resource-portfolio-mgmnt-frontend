@@ -1,5 +1,6 @@
 import { ResourceHoliday } from "src/resource_holiday/entities/resource_holiday.entity";
-import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
 export class Holiday {
@@ -17,4 +18,12 @@ export class Holiday {
 
     @OneToMany(() => ResourceHoliday, resourceHoliday => resourceHoliday.holiday)
     resourceHolidays: ResourceHoliday[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'created_by' })
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updated_by' })
+    updatedBy: User;
 }

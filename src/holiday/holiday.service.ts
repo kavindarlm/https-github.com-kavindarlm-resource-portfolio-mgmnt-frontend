@@ -6,6 +6,7 @@ import { Holiday } from './entities/holiday.entity';
 import { Equal, Repository } from 'typeorm';
 import { ResourceHoliday } from 'src/resource_holiday/entities/resource_holiday.entity';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class HolidayService {
@@ -19,7 +20,7 @@ export class HolidayService {
   ) { }
 
   // post public, bank or mercantile hoildays for all resources
-  async addEvent(date: Date, holy_type: string, resourceIds: string[]): Promise<Holiday> {
+  async addEvent(date: Date, holy_type: string, resourceIds: string[], created_by: number): Promise<Holiday> {
     try {
       if (!date || isNaN(date.getTime())) {
         throw new Error('Invalid date');
@@ -30,7 +31,7 @@ export class HolidayService {
         resourceIds = resources.map(resource => resource.resourceId);
       }
 
-      const holiday = this.holidaysRepository.create({ date, holy_type });
+      const holiday = this.holidaysRepository.create({ date, holy_type, createdBy: { user_id: created_by}});
       await this.holidaysRepository.save(holiday);
 
       for (const resourceId of resourceIds) {
@@ -49,7 +50,7 @@ export class HolidayService {
   }
 
   // to post resource holiday
-  async resourceAddEvent(selectedDates: { year: number, month: number, day: number }[], holidayType: string, resourceId: string): Promise<Holiday[]> {
+  async resourceAddEvent(selectedDates: { year: number, month: number, day: number }[], holidayType: string, resourceId: string, created_by: number): Promise<Holiday[]> {
     try {
       const resource = await this.resourcesRepository.findOne({ where: { resourceId: resourceId } });
       if (!resource) {
@@ -60,7 +61,7 @@ export class HolidayService {
 
       for (const selectedDate of selectedDates) {
         const date = new Date(selectedDate.year, selectedDate.month - 1, selectedDate.day);
-        const holiday = this.holidaysRepository.create({ date, holy_type: holidayType });
+        const holiday = this.holidaysRepository.create({ date, holy_type: holidayType , createdBy: { user_id: created_by}});
         await this.holidaysRepository.save(holiday);
 
         const resourceHoliday = this.resourceHolidaysRepository.create({ holiday, resource });
@@ -94,6 +95,7 @@ export class HolidayService {
 
     holiday.date = new Date(updateHolidayDto.date);
     holiday.holy_type = updateHolidayDto.holy_type;
+    holiday.updatedBy = { user_id: updateHolidayDto.updatedBy} as User;
 
     await this.holidaysRepository.save(holiday);
 

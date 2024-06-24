@@ -1,10 +1,10 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTeamDto, CreateTeamParams, UpdateTeamParams } from './dto/create-team.dto';
-import { UpdateTeamDto } from './dto/update-team.dto';
+import {  Injectable, NotFoundException } from '@nestjs/common';
+import {  CreateTeamParams } from './dto/create-team.dto';
 import { InjectEntityManager, InjectRepository } from '@nestjs/typeorm';
 import { Team } from './entities/team.entity';
 import { EntityManager, Repository } from 'typeorm';
 import { Resource } from 'src/resource/entities/resource.entity';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class TeamService {
@@ -14,6 +14,7 @@ export class TeamService {
   constructor(
     @InjectRepository(Team) private readonly teamRepository: Repository<Team>,
     @InjectRepository(Resource) private readonly resourceRepository: Repository<Resource>,
+    @InjectRepository(User) private userRepository: Repository<User>,
     @InjectEntityManager() private entityManager: EntityManager) { }
 
   async getTeams(): Promise<Team[]> {
@@ -46,7 +47,7 @@ export class TeamService {
     const team_Name = teamName;
 
     // Create a new team
-    const team = this.teamRepository.create({ team_Name, team_description });
+    const team = this.teamRepository.create({ team_Name, team_description, createdBy: {user_id: createTeamParams.createdBy} as User });
     await this.teamRepository.save(team);
 
     // Assign resources to the team

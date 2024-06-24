@@ -3,6 +3,7 @@ export class UpdateOrgUnitDto {
     unitName: string;
     description: string;
     parentId: number;
+    updatedBy: number; 
 }
 
 export type UpdateOrgUnitParams = {
@@ -10,4 +11,5 @@ export type UpdateOrgUnitParams = {
     unitName: string;
     description: string;
     parentId: number;
+    updatedBy: number;
 }

@@ -1,4 +1,5 @@
 import { Project } from "src/project/entities/project.entity";
+import { User } from "src/user/entities/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: "tasks" })
@@ -26,5 +27,16 @@ export class Task{
 
     @ManyToOne(() => Project, (project) => project.tasks)
     @JoinColumn({ name: 'TaskProjectId' })
-    project: Project; 
-}
+    project: Project;
+
+    @Column({ type: 'timestamp' })
+    createdTime: Date;
+    
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'created_by'})
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updated_by'})
+    updatedBy: User;
+}  

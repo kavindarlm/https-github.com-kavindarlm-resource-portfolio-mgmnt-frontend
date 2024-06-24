@@ -1,5 +1,6 @@
 import { Resource } from "src/resource/entities/resource.entity";
-import { Column, Entity, OneToMany, ManyToOne, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
+import { User } from "src/user/entities/user.entity";
+import { Column, Entity, OneToMany, ManyToOne, PrimaryGeneratedColumn, JoinColumn } from "typeorm";
 
 @Entity({ name: 'org_unit' })
 export class OrgUnit {
@@ -28,5 +29,13 @@ export class OrgUnit {
  
      @OneToMany(() => OrgUnit, unit => unit.parent)
      children: OrgUnit[];
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'createdBy' })
+    createdBy: User;
+
+    @ManyToOne(() => User)
+    @JoinColumn({ name: 'last_updatedBy' })
+    updatedBy: User;
 
 }

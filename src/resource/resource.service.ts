@@ -1,6 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateResourceDto } from './dto/create-resource.dto';
-import { UpdateResourceDto } from './dto/update-resource.dto';
 import { Resource } from './entities/resource.entity';
 import { IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -9,6 +7,7 @@ import { CreateResourceParams } from './dto/create-resource.dto';
 import { UpdateResourceParams } from './dto/update-resource.dto';
 import { JobRole } from 'src/job_role/entities/job_role.entity';
 import { OrgUnit } from 'src/org_unit/entities/org_unit.entity';
+import { User } from 'src/user/entities/user.entity';
 
 export interface ResourceWithInitials extends Resource {
   initials?: string;
@@ -46,12 +45,12 @@ export class ResourceService {
   }
 
   createResource(resourceDetails: CreateResourceParams) {
-    const newResource = this.resourceRepository.create({ ...resourceDetails, createdAt: new Date() });
+    const newResource = this.resourceRepository.create({ ...resourceDetails, createdAt: new Date(), createdBy: {user_id: resourceDetails.createdBy} as User });
     return this.resourceRepository.save(newResource);
   }
 
   updateResource(resourceId: string, updateResourceDetails: UpdateResourceParams) {
-    return this.resourceRepository.update({ resourceId }, { ...updateResourceDetails });
+    return this.resourceRepository.update({ resourceId }, { ...updateResourceDetails, updatedBy: {user_id: updateResourceDetails.updatedBy} as User });
   }
 
   deleteResource(resourceId: string) {
@@ -168,6 +167,10 @@ async getResourceById(resourceId: string): Promise<ResourceWithInitials> {
   return resource;
 }
 
+// New method to count resources
+async countResources(): Promise<number> {
+  return this.resourceRepository.count();
+}
 
 
 }
