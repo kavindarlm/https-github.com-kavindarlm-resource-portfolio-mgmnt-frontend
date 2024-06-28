@@ -3,10 +3,13 @@ import { CreateHolidayDto } from './dto/create-holiday.dto';
 import { UpdateHolidayDto } from './dto/update-holiday.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Holiday } from './entities/holiday.entity';
-import { Equal, Repository } from 'typeorm';
+import { Between, Equal, In, LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 import { ResourceHoliday } from 'src/resource_holiday/entities/resource_holiday.entity';
 import { Resource } from 'src/resource/entities/resource.entity';
 import { User } from 'src/user/entities/user.entity';
+
+
+
 
 @Injectable()
 export class HolidayService {
@@ -19,6 +22,47 @@ export class HolidayService {
     private resourcesRepository: Repository<Resource>,
   ) { }
 
+  private startOfDay(date: Date): Date {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 0, 0, 0));
+  }
+  
+  private endOfDay(date: Date): Date {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate() + 1, 0, 0, 0));
+  }
+  
+  async isTodayAHoliday(): Promise<boolean> {
+    const today = new Date();
+    const todayStart = this.startOfDay(today);
+    const todayEnd = this.endOfDay(today);
+  
+    console.log(`Today's date: ${today}`);
+    console.log(`Start of today (UTC): ${todayStart.toISOString()}`);
+    console.log(`End of today (UTC): ${todayEnd.toISOString()}`);
+  
+    try {
+      const query = this.holidaysRepository.createQueryBuilder('holiday')
+        .where('holiday.date >= :start AND holiday.date < :end', { start: todayStart.toISOString(), end: todayEnd.toISOString() })
+        .andWhere('holiday.holy_type IN (:...types)', { types: ['public', 'bank', 'mercantile'] });
+  
+      const sqlQuery = query.getSql();
+      console.log(`SQL Query: ${sqlQuery}`);
+      console.log(`Query Parameters: start = ${todayStart.toISOString()}, end = ${todayEnd.toISOString()}, types = ['public', 'bank', 'mercantile']`);
+  
+      const holiday = await query.getOne();
+  
+      if (holiday) {
+        console.log(`Found a holiday: ${JSON.stringify(holiday)}`);
+      } else {
+        console.log('No holidays found for today.');
+      }
+  
+      return !!holiday;
+    } catch (error) {
+      console.error('Error querying holidays:', error);
+      throw error;
+    }
+  }
+  
   // post public, bank or mercantile hoildays for all resources
   async addEvent(date: Date, holy_type: string, resourceIds: string[], created_by: number): Promise<Holiday> {
     try {
@@ -165,4 +209,3 @@ export class HolidayService {
 
 
 }
-

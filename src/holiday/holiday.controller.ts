@@ -11,6 +11,12 @@ import { GetUser } from 'src/Auth/get-user.decorator';
 export class HolidayController {
   constructor(private readonly holidayService: HolidayService) { }
 
+  @Get('/is-today-holiday')
+  async isTodayAHoliday(): Promise<{ isHoliday: boolean }> {
+    const isHoliday = await this.holidayService.isTodayAHoliday();
+    return { isHoliday };
+  }
+  
   //post global holidays 
   @Post()
   async addEvent(@Body() createHolidayDto: CreateHolidayDto, @GetUser() user : any): Promise<Holiday> {
@@ -77,5 +83,7 @@ export class HolidayController {
   async findAll(): Promise<{ resourceId: string, roleName: string, unitName: string }[]> {
     return this.holidayService.findAll();
   }
+
+
 
 }
