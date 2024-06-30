@@ -27,8 +27,8 @@ const generatePassword = (length: number, chars: string): string => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'malinthakavinda24@gmail.com',
-    pass: 'hxaynheaabsbghaj'
+    user: 'taprotechnologies2@gmail.com',
+    pass: 'xjmzjhkpkgdcurae'
   }
 });
 
@@ -57,7 +57,7 @@ export class UserController {
     // delete user.password;
 
     const mailOptions = {
-      from: 'malinthakavinda24@gmail.com',
+      from: 'taprotechnologies2@gmail.com',
       to: createUserDto.user_email,
       subject: 'Tapro Project & Resource management system',
       html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
@@ -192,7 +192,7 @@ export class UserController {
       const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
       const mailOptions = {
-        from: 'malinthakavinda24@gmail.com',
+        from: 'taprotechnologies2@gmail.com',
         to: updateUser.user_email,
         subject: 'Tapro Project & Resource management system',
         html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
@@ -255,7 +255,7 @@ export class UserController {
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
     const mailOptions = {
-      from: 'malinthakavinda24@gmail.com',
+      from: 'taprotechnologies2@gmail.com',
       to: user_email,
       subject: 'Tapro Project & Resource management system',
       html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
