@@ -69,23 +69,27 @@ getResourceById(@Param('resourceId') resourceId: string): Promise<ResourceWithIn
     }));
   }
 
+  //get a resource by id
   @Get(':resourceId')
   async findOneResource(@Param('resourceId') resourceId: string) {
     return this.resourceService.findOneResource(resourceId);
   }
 
+  //create a resource
   @Post()
   createResource(@Body() createResourceDto: CreateResourceDto, @GetUser() user: any) {
     createResourceDto.createdBy = user.id;
     return this.resourceService.createResource(createResourceDto);
   }
 
+  //update resources
   @Put(':resourceId')
   async updateResourceById(@Param('resourceId') resourceId: string, @Body() updateResourceDto: UpdateResourceDto, @GetUser() user: any) {
     updateResourceDto.updatedBy = user.id;
     await this.resourceService.updateResource(resourceId, updateResourceDto);
   }
 
+  //delete resources
   @Delete(':resourceId')
   async deleteResourceById(@Param('resourceId') resourceId: string) {
     await this.resourceService.deleteResource(resourceId);

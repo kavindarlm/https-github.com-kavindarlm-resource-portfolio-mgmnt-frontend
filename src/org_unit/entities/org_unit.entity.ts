@@ -23,12 +23,12 @@ export class OrgUnit {
     @OneToMany(() => Resource, resource => resource.org_unit)
     resources: Resource[];
 
-     // Self-referencing relationship
-     @ManyToOne(() => OrgUnit, unit => unit.children)
-     parent: OrgUnit;
- 
-     @OneToMany(() => OrgUnit, unit => unit.parent)
-     children: OrgUnit[];
+    // Self-referencing relationship
+    @ManyToOne(() => OrgUnit, unit => unit.children)
+    parent: OrgUnit;
+
+    @OneToMany(() => OrgUnit, unit => unit.parent)
+    children: OrgUnit[];
 
     @ManyToOne(() => User)
     @JoinColumn({ name: 'createdBy' })

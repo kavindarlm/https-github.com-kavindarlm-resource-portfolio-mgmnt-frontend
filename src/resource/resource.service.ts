@@ -19,10 +19,10 @@ export class ResourceService {
 
   //to interact with database, inject typeorm repository in to our class
   constructor(@InjectRepository(Resource) private resourceRepository: Repository<Resource>,
-  @InjectRepository(JobRole)
-  private jobRoleRepository: Repository<JobRole>,
-  @InjectRepository(OrgUnit)
-  private orgUnitRepository: Repository<OrgUnit>,) { }
+    @InjectRepository(JobRole)
+    private jobRoleRepository: Repository<JobRole>,
+    @InjectRepository(OrgUnit)
+    private orgUnitRepository: Repository<OrgUnit>,) { }
 
 
   async findResources(): Promise<Resource[]> {
@@ -45,12 +45,12 @@ export class ResourceService {
   }
 
   createResource(resourceDetails: CreateResourceParams) {
-    const newResource = this.resourceRepository.create({ ...resourceDetails, createdAt: new Date(), createdBy: {user_id: resourceDetails.createdBy} as User });
+    const newResource = this.resourceRepository.create({ ...resourceDetails, createdAt: new Date(), createdBy: { user_id: resourceDetails.createdBy } as User });
     return this.resourceRepository.save(newResource);
   }
 
   updateResource(resourceId: string, updateResourceDetails: UpdateResourceParams) {
-    return this.resourceRepository.update({ resourceId }, { ...updateResourceDetails, updatedBy: {user_id: updateResourceDetails.updatedBy} as User });
+    return this.resourceRepository.update({ resourceId }, { ...updateResourceDetails, updatedBy: { user_id: updateResourceDetails.updatedBy } as User });
   }
 
   deleteResource(resourceId: string) {
@@ -60,23 +60,23 @@ export class ResourceService {
   //methods for team management
 
   //display resources which do not have teamid only and filer by jobrole and unit
-  async getResourcesByTeamIdNull(jobRole?: string, orgUnit?: string): Promise<{resourceId: string, roleName: string, unitName: string }[]> {
+  async getResourcesByTeamIdNull(jobRole?: string, orgUnit?: string): Promise<{ resourceId: string, roleName: string, unitName: string }[]> {
     let query = this.resourceRepository
       .createQueryBuilder('resource')
       .leftJoinAndSelect('resource.job_role', 'job_role')
       .leftJoinAndSelect('resource.org_unit', 'org_unit')
       .where('resource.teamId IS NULL');
-  
+
     if (jobRole) {
       query = query.andWhere('job_role.roleName = :jobRole', { jobRole });
     }
-  
+
     if (orgUnit) {
       query = query.andWhere('org_unit.unitName = :orgUnit', { orgUnit });
     }
-  
+
     const resources = await query.getMany();
-  
+
     return resources.map(resource => ({
       resourceId: resource.resourceId,
       roleName: resource.job_role.roleName,
@@ -95,82 +95,82 @@ export class ResourceService {
     const orgUnits = await this.orgUnitRepository.find();
     return orgUnits.map(unit => unit.unitName);
   }
-  
-  
- //display resoures which team id is null and team id == teamId
-  async getResourcesByTeamIdAndNull(teamId: number): Promise<{resourceId: string, roleName: string, unitName: string }[]> {
+
+
+  //display resoures which team id is null and team id == teamId
+  async getResourcesByTeamIdAndNull(teamId: number): Promise<{ resourceId: string, roleName: string, unitName: string }[]> {
     // Fetch resources where teamId is the provided teamId or null
-    const resources = await this.resourceRepository.find({ 
-        where: [
-            { teamId: teamId },
-            { teamId: IsNull() }
-        ],
-        relations: ['job_role', 'org_unit'] 
+    const resources = await this.resourceRepository.find({
+      where: [
+        { teamId: teamId },
+        { teamId: IsNull() }
+      ],
+      relations: ['job_role', 'org_unit']
     });
 
     // Sort resources so that resources with the same teamId come first
     resources.sort((a, b) => (a.teamId === b.teamId ? 0 : a.teamId ? -1 : 1));
 
     return resources.map(resource => ({
-        resourceId: resource.resourceId,
-        roleName: resource.job_role.roleName,
-        unitName: resource.org_unit.unitName,
+      resourceId: resource.resourceId,
+      roleName: resource.job_role.roleName,
+      unitName: resource.org_unit.unitName,
     }));
-}
-
-async getResourcesByTeamId(teamId: number, jobRole?: string, orgUnit?: string): Promise<{resourceId: string, roleName: string, unitName: string, teamId: number }[]> {
-  // Start building the query
-  let query = this.resourceRepository
-    .createQueryBuilder('resource')
-    .leftJoinAndSelect('resource.job_role', 'job_role')
-    .leftJoinAndSelect('resource.org_unit', 'org_unit')
-    .where('resource.teamId = :teamId', { teamId });
-
-  // Add conditions for jobRole and orgUnit if they're defined
-  if (jobRole) {
-    query = query.andWhere('job_role.roleName = :jobRole', { jobRole });
-  }
-  if (orgUnit) {
-    query = query.andWhere('org_unit.unitName = :orgUnit', { orgUnit });
   }
 
-  // Execute the query
-  const resources = await query.getMany();
+  async getResourcesByTeamId(teamId: number, jobRole?: string, orgUnit?: string): Promise<{ resourceId: string, roleName: string, unitName: string, teamId: number }[]> {
+    // Start building the query
+    let query = this.resourceRepository
+      .createQueryBuilder('resource')
+      .leftJoinAndSelect('resource.job_role', 'job_role')
+      .leftJoinAndSelect('resource.org_unit', 'org_unit')
+      .where('resource.teamId = :teamId', { teamId });
 
-  return resources.map(resource => ({
-    resourceId: resource.resourceId,
-    roleName: resource.job_role.roleName,
-    unitName: resource.org_unit.unitName,
-    teamId: resource.teamId,
-  }));
-}
+    // Add conditions for jobRole and orgUnit if they're defined
+    if (jobRole) {
+      query = query.andWhere('job_role.roleName = :jobRole', { jobRole });
+    }
+    if (orgUnit) {
+      query = query.andWhere('org_unit.unitName = :orgUnit', { orgUnit });
+    }
 
-// In your ResourceService
-// async getResourceById(resourceId: string): Promise<Resource> {
-//   const resource = await this.resourceRepository.findOne({ where: { resourceId } });
-//   if (!resource) {
-//     throw new NotFoundException(`Resource with id ${resourceId} not found`);
-//   }
-//   return resource;
-// }
+    // Execute the query
+    const resources = await query.getMany();
 
-async getResourceById(resourceId: string): Promise<ResourceWithInitials> {
-  const resource = await this.resourceRepository.findOne({ where: { resourceId } }) as ResourceWithInitials;
-  if (!resource) {
-    throw new NotFoundException(`Resource with id ${resourceId} not found`);
+    return resources.map(resource => ({
+      resourceId: resource.resourceId,
+      roleName: resource.job_role.roleName,
+      unitName: resource.org_unit.unitName,
+      teamId: resource.teamId,
+    }));
   }
 
-  // Get the initials of the name
-  const nameParts = resource.resourceName.split(' ');
-  resource.initials = nameParts.map(part => part.charAt(0).toUpperCase()).join('');
+  // In your ResourceService
+  // async getResourceById(resourceId: string): Promise<Resource> {
+  //   const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+  //   if (!resource) {
+  //     throw new NotFoundException(`Resource with id ${resourceId} not found`);
+  //   }
+  //   return resource;
+  // }
 
-  return resource;
-}
+  async getResourceById(resourceId: string): Promise<ResourceWithInitials> {
+    const resource = await this.resourceRepository.findOne({ where: { resourceId } }) as ResourceWithInitials;
+    if (!resource) {
+      throw new NotFoundException(`Resource with id ${resourceId} not found`);
+    }
 
-// New method to count resources
-async countResources(): Promise<number> {
-  return this.resourceRepository.count();
-}
+    // Get the initials of the name
+    const nameParts = resource.resourceName.split(' ');
+    resource.initials = nameParts.map(part => part.charAt(0).toUpperCase()).join('');
+
+    return resource;
+  }
+
+  // New method to count resources
+  async countResources(): Promise<number> {
+    return this.resourceRepository.count();
+  }
 
 
 }
