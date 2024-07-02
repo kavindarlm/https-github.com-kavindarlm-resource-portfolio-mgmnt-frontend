@@ -21,15 +21,29 @@ export class TeamService {
     return this.teamRepository.find();
   }
 
-
   //method to get all teams
-  findTeams() {
-    //get all the team records from the teams table
-    return this.teamRepository.find({
-      order: {
-        createdAt: 'DESC'
-      }
-    });
+  // findTeams() {
+  //   //get all the team records from the teams table
+  //   return this.teamRepository.find({
+  //     order: {
+  //       createdAt: 'DESC'
+  //     }
+  //   });
+  // }
+
+  async findTeams() {
+    return this.teamRepository.createQueryBuilder('team')
+      .leftJoin('team.resources', 'resource')
+      .select('team.teamId', 'teamId') // Keep selecting the team id
+      .addSelect('team.team_Name', 'teamName') // Keep selecting the team name
+      // Add selects for all other fields in the team entity. For example:
+      .addSelect('team.team_description', 'teamDescription')
+      .addSelect('team.createdAt', 'createdAt')
+      // Add any other fields from the team entity here
+      .addSelect('COUNT(resource.resourceId)', 'resourceCount') // Keep counting the number of resources
+      .groupBy('team.teamId') // Keep the group by to ensure correct aggregation
+      .orderBy('team.createdAt', 'DESC') // Keep the order by creation date
+      .getRawMany(); // Keep getting raw results suitable for aggregated values
   }
   
   //method to create team by updating teamid column in resource table
