@@ -9,8 +9,6 @@ import { Resource } from 'src/resource/entities/resource.entity';
 import { User } from 'src/user/entities/user.entity';
 
 
-
-
 @Injectable()
 export class HolidayService {
   constructor(
@@ -34,26 +32,24 @@ export class HolidayService {
     const today = new Date();
     const todayStart = this.startOfDay(today);
     const todayEnd = this.endOfDay(today);
-  
-    console.log(`Today's date: ${today}`);
-    console.log(`Start of today (UTC): ${todayStart.toISOString()}`);
-    console.log(`End of today (UTC): ${todayEnd.toISOString()}`);
-  
+    // console.log(`Today's date: ${today}`);
+    // console.log(`Start of today (UTC): ${todayStart.toISOString()}`);
+    // console.log(`End of today (UTC): ${todayEnd.toISOString()}`);
     try {
       const query = this.holidaysRepository.createQueryBuilder('holiday')
         .where('holiday.date >= :start AND holiday.date < :end', { start: todayStart.toISOString(), end: todayEnd.toISOString() })
         .andWhere('holiday.holy_type IN (:...types)', { types: ['public', 'bank', 'mercantile'] });
   
       const sqlQuery = query.getSql();
-      console.log(`SQL Query: ${sqlQuery}`);
-      console.log(`Query Parameters: start = ${todayStart.toISOString()}, end = ${todayEnd.toISOString()}, types = ['public', 'bank', 'mercantile']`);
+      // console.log(`SQL Query: ${sqlQuery}`);
+      // console.log(`Query Parameters: start = ${todayStart.toISOString()}, end = ${todayEnd.toISOString()}, types = ['public', 'bank', 'mercantile']`);
   
       const holiday = await query.getOne();
   
       if (holiday) {
-        console.log(`Found a holiday: ${JSON.stringify(holiday)}`);
+        // console.log(`Found a holiday: ${JSON.stringify(holiday)}`);
       } else {
-        console.log('No holidays found for today.');
+        // console.log('No holidays found for today.');
       }
   
       return !!holiday;
