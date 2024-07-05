@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { Resource } from './entities/resource.entity';
 import { IsNull, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -53,8 +53,23 @@ export class ResourceService {
     return this.resourceRepository.update({ resourceId }, { ...updateResourceDetails, updatedBy: { user_id: updateResourceDetails.updatedBy } as User });
   }
 
-  deleteResource(resourceId: string) {
-    return this.resourceRepository.delete({ resourceId });
+  async deleteResource(resourceId: string) {
+    // Check if the resource exists
+    const resource = await this.resourceRepository.findOne({ where: { resourceId } });
+    if (!resource) {
+      throw new NotFoundException(`Resource with ID ${resourceId} not found.`);
+    }
+
+    try {
+      // Attempt to delete the resource
+      await this.resourceRepository.delete(resourceId);
+      return { message: 'Resource deleted successfully' };
+    } catch (error) {
+      if (error.errno === 1451) { // MySQL foreign key constraint failure
+        throw new BadRequestException(`Could not delete Resource because it is associated with other data.`);
+      }
+      throw new BadRequestException(`Could not delete Resource due to an unexpected error: ${error.message}`);
+    }
   }
 
   //methods for team management

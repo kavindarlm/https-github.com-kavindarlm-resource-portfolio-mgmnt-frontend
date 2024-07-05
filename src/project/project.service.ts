@@ -18,25 +18,25 @@ export class ProjectService {
     @InjectRepository(Resource) private resourceRepository: Repository<Resource>,
   ) {}
 
-  //Create Project
+  // Create Project
   async createProject(createProjectDto: CreateProjectDto) {
     try {
       const deliveryManager = await this.resourceRepository.findOne({
         where: { resourceId: createProjectDto.deliveryManager_id },
       });
       const projectManager = await this.resourceRepository.findOne({
-        where: { resourceId: createProjectDto.projectManager_id}
-      })
+        where: { resourceId: createProjectDto.projectManager_id }
+      });
 
       if (!deliveryManager) {
         throw new NotFoundException('Delivery Manager not found');
       }
-      if(!projectManager){
+      if (!projectManager) {
         throw new NotFoundException('Project Manager not found');
       }
 
       const newProject = this.projectRepository.create({
-        ...createProjectDto, createdBy: {user_id: createProjectDto.createdBy} as User
+        ...createProjectDto, createdBy: { user_id: createProjectDto.createdBy } as User
       });
 
       return this.projectRepository.save(newProject);
@@ -45,58 +45,62 @@ export class ProjectService {
     }
   }
 
-  //Find all projects
-  findPeojects(showProjects: number): Promise<Project[]> {
+  // Find all active projects
+  findProjects(showProjects: number): Promise<Project[]> {
     return this.projectRepository
       .createQueryBuilder('project')
+      .where('project.isActive = :isActive', { isActive: true })
       .orderBy('project.createdDate', 'DESC')
       .take(showProjects)
       .getMany();
   }
 
-  //finfProject by ID
+  // Find project by ID
   async findProjectById(projectId: number): Promise<Project> {
     try {
       const project = await this.projectRepository.findOne({
-        where: { projectid: projectId },
+        where: { projectid: projectId, isActive: true },
       });
       if (!project) {
         throw new NotFoundException(`Project with ID ${projectId} not found`);
       }
       return project;
     } catch (error) {
-      throw new NotFoundException(`Project with ID ${projectId}  not found`);
+      throw new NotFoundException(`Project with ID ${projectId} not found`);
     }
   }
 
-  ///Delete project
-  async deleteProject(projectid: string) {
+  // Soft delete project
+  async deleteProject(projectid: number) {
     try {
-      const deleteResult = await this.projectRepository.delete(projectid);
-      if (deleteResult.affected === 0) {
+      const project = await this.projectRepository.findOne({
+        where: { projectid },
+      });
+      if (!project) {
         throw new NotFoundException(`Project with ID ${projectid} not found`);
       }
-      return deleteResult;
+
+      project.isActive = false;
+      await this.projectRepository.save(project);
+      return { message: `Project with ID ${projectid} has been archived.` };
     } catch (error) {
-      throw new BadRequestException(
-        'Could not delete project. Please check your request.',
-      );
+      throw new BadRequestException('Could not archive project. Please check your request.');
     }
   }
 
-  //Count project
+  // Count active projects
   async countProjects(): Promise<number> {
     try {
-      return await this.projectRepository.count();
+      return await this.projectRepository.count({ where: { isActive: true } });
     } catch (error) {
       throw new BadRequestException('Could not count projects');
     }
   }
 
-  //Update project details
+  // Update project details
   async updateProject(projectId: number, updateProjectDetails: UpdateProjectDto): Promise<Project> {
     try {
-      const project = await this.projectRepository.findOne({ where: { projectid: projectId } });
+      const project = await this.projectRepository.findOne({ where: { projectid: projectId, isActive: true } });
       if (!project) {
         throw new NotFoundException(`Project with ID ${projectId} not found`);
       }
@@ -126,7 +130,8 @@ export class ProjectService {
         ...project,
         ...updateProjectDetails,
         deliveryManager: deliveryManager,
-        projectManager: projectManager, updatedBy: {user_id: updateProjectDetails.updatedBy} as User
+        projectManager: projectManager,
+        updatedBy: { user_id: updateProjectDetails.updatedBy } as User
       };
 
       await this.projectRepository.save(updatedProjectData);
@@ -136,48 +141,52 @@ export class ProjectService {
     }
   }
 
-  //High critical project count
+  // Count high criticality projects
   async countHighCriticalityProjects(): Promise<number> {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
         .where('project.criticality_id = :criticality_id', { criticality_id: '1' })
+        .andWhere('project.isActive = :isActive', { isActive: true })
         .getCount();
     } catch (error) {
       throw new BadRequestException('Could not count high criticality projects');
     }
   }
 
-  //Low critical project count
+  // Count low criticality projects
   async countLowCriticalityProjects(): Promise<number> {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
         .where('project.criticality_id = :criticality_id', { criticality_id: '3' })
+        .andWhere('project.isActive = :isActive', { isActive: true })
         .getCount();
     } catch (error) {
-      throw new  BadRequestException('Could not count low criticality projects');
+      throw new BadRequestException('Could not count low criticality projects');
     }
   }
 
-  //Medium critical project count
+  // Count medium criticality projects
   async countMediumCriticalityProjects(): Promise<number> {
     try {
       return await this.projectRepository
         .createQueryBuilder('project')
         .where('project.criticality_id = :criticality_id', { criticality_id: '2' })
+        .andWhere('project.isActive = :isActive', { isActive: true })
         .getCount();
     } catch (error) {
       throw new BadRequestException('Could not count medium criticality projects');
     }
   }
 
-  //Search Project By Name
+  // Search project by name
   async searchProject(alias: string) {
-    return this.projectRepository.createQueryBuilder(alias);
+    return this.projectRepository.createQueryBuilder(alias)
+      .where(`${alias}.isActive = :isActive`, { isActive: true });
   }
 
-  //Get resource Id and the Resource name
+  // Get resource ID and name
   async getResourceNameAndId(): Promise<{ resourceId: string; resourceName: string }[]> {
     const resources = await this.resourceRepository.find({
       select: ['resourceId', 'resourceName'],
@@ -188,7 +197,7 @@ export class ProjectService {
     }));
   }
 
-  //Get resource by id
+  // Get resource by ID
   async getResourceNameById(resourceId: string): Promise<{ resourceId: string; resourceName: string }> {
     try {
       const resource = await this.resourceRepository.findOne({ where: { resourceId } });
@@ -205,7 +214,7 @@ export class ProjectService {
   async getProjectsByCriticality(criticalityId: number): Promise<Partial<Project>[]> {
     try {
       const projects = await this.projectRepository.find({
-        where: { criticality_id: criticalityId },
+        where: { criticality_id: criticalityId, isActive: true },
         select: [
           'projectid',
           'projectName',
@@ -223,8 +232,4 @@ export class ProjectService {
       throw new BadRequestException(`Could not get projects by criticality ID ${criticalityId}`);
     }
   }
-
 }
-
-
-
