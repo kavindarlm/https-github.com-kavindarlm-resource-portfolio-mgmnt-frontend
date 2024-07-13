@@ -214,7 +214,7 @@ export class TaskService {
             // Calculate the progress for each project and count the ones with progress < 100
             for (const project of projects) {
                 const progress = await this.getProjectProgressByProjectId(project.projectid);
-                if (progress < 100) {
+                if (progress < 100 && progress > 0) {
                     notCompletedProjectCount++;
                 }
             }
