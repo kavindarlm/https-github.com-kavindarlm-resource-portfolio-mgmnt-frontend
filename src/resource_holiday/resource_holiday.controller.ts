@@ -14,5 +14,10 @@ export class ResourceHolidayController {
     return await this.resourceHolidayService.getResourceHolidaysByResourceId(resourceId);
   }
   
+  @Get('/count/today')
+  async getCountOfResourcesWithHolidayToday() {
+  return await this.resourceHolidayService.getCountOfResourcesWithHolidayToday();
+ }
 
+  
 }

@@ -11,28 +11,33 @@ export class JobRoleController {
 
   constructor(private jobRoleService: JobRoleService) {}
 
+  //get job roles
   @Get()
   async getJobRoles() {
     return this.jobRoleService.findJobRole();
   }
 
+  //get job role by id
   @Get(':roleId')
   async getRoleNameById(@Param('roleId', ParseIntPipe) roleId: number) {
     return this.jobRoleService.getRoleNameById(roleId);
   }
 
+  //create a job role
   @Post()
   createJobRole(@Body() createJobRoleDto: CreateJobRoleDto, @GetUser() user: any) {
     createJobRoleDto.createdBy = user.id;
     return this.jobRoleService.createJobRole(createJobRoleDto);
   }
 
+  //update a job role
   @Put(':roleId')
   async updateJobRoleById(@Param('roleId', ParseIntPipe) roleId:number, @Body() updateJobRoleDto: UpdateJobRoleDto, @GetUser() user: any) {
     updateJobRoleDto.updatedBy = user.id;
     await this.jobRoleService.updateJobRole(roleId, updateJobRoleDto);
   }
 
+  //delete a job role
   @Delete(':roleId')
   async deleteJobRoleById(@Param('roleId', ParseIntPipe) roleId:number) {
     await this.jobRoleService.deleteJobRole(roleId);

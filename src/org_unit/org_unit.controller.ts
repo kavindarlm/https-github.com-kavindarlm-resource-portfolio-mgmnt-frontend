@@ -23,22 +23,26 @@ import { GetUser } from 'src/Auth/get-user.decorator';
 export class OrgUnitController {
   constructor(private orgUnitService: OrgUnitService) { }
 
+  //create org unit
   @Post()
   createOrgUnit(@Body() createOrgUnitDto: CreateOrgUnitDto, @GetUser() user: any) {
     createOrgUnitDto.createdBy = user.id;
     return this.orgUnitService.createOrgUnit(createOrgUnitDto);
   }
 
+  //get org units
   @Get()
   async getOrgUnits() {
     return this.orgUnitService.findOrgUnits();
   }
 
+  //get org units by id
   @Get(':unitId')
   async getUnitById(@Param('unitId') unitId: number) {
     return this.orgUnitService.getUnitById(unitId);
   }
 
+  //update org unit
   @Put(':unitId')
   async updateOrgUnitById(
     @Param('unitId', ParseIntPipe) unitId: number,
@@ -49,6 +53,7 @@ export class OrgUnitController {
     await this.orgUnitService.updateOrgUnit(unitId, updateOrgUnitDto);
   }
 
+  //delete org unit
   @Delete(':unitId')
   async deleteOrgUnitById(@Param('unitId', ParseIntPipe) unitId: number) {
     const hasChildren = await this.orgUnitService.hasChildUnits(unitId);
@@ -63,13 +68,14 @@ export class OrgUnitController {
   }
 
 
+  //to check if the org unit has child units
   @Get(':unitId/has-children')
   async hasChildUnits(@Param('unitId', ParseIntPipe) unitId: number) {
     const hasChildren = await this.orgUnitService.hasChildUnits(unitId);
     return hasChildren;
   }
 
-
+  //to get org unit hierarchy
   @Get('hierarchy/data')
   async getOrgUnitHierarchy(): Promise<any> {
     return this.orgUnitService.getOrgUnitHierarchy();
@@ -83,6 +89,7 @@ export class OrgUnitController {
     return this.orgUnitService.getAncestors(unitId);
   }
 
+  //to get the parent units recursively
   @Get('parent/:id')
   async getParentDetails(@Param('id') id: number) {
     return this.orgUnitService.getParentDetailsRecursive(id);
