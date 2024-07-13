@@ -12,6 +12,9 @@ import * as nodemailer from 'nodemailer';
 import { NotFoundException } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/Auth/jwtauthGuard';
 import { GetUser } from 'src/Auth/get-user.decorator';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 const generatePassword = (length: number, chars: string): string => {
   let password = "";
@@ -24,22 +27,25 @@ const generatePassword = (length: number, chars: string): string => {
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: 'malinthakavinda24@gmail.com',
-    pass: 'hxaynheaabsbghaj'
+    user: 'taprotechnologies2@gmail.com',
+    pass: 'xjmzjhkpkgdcurae'
   }
 });
 
 @Controller('api')
 export class UserController {
-  constructor(private userService: UserService, private jwtService: JwtService, private readonly usersFunctionService: UsersFunctionService) { }
+  constructor(private userService: UserService, private jwtService: JwtService, private readonly usersFunctionService: UsersFunctionService,
+    @InjectRepository(User) private userRepo: Repository<User>) { }
 
+  //  controller for registering a user
+  @UseGuards(JwtAuthGuard)
   @Post('register')
   @UsePipes(ValidationPipe)
   async register(@Body() createUserDto: CreateUserDto & { password: string }, @GetUser() users: any) {
     let password = generatePassword(8, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789')
     createUserDto.password = password;
-     createUserDto.created_by = users.id;
-     console.log(createUserDto);
+    createUserDto.created_by = users.id;
+    console.log(createUserDto);
     if (!createUserDto.password) {
       throw new BadRequestException('Password is required');
     }
@@ -51,7 +57,7 @@ export class UserController {
     // delete user.password;
 
     const mailOptions = {
-      from: 'malinthakavinda24@gmail.com',
+      from: 'taprotechnologies2@gmail.com',
       to: createUserDto.user_email,
       subject: 'Tapro Project & Resource management system',
       html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
@@ -67,9 +73,8 @@ export class UserController {
       }
     });
 
-
     return {
-      password: password, //in this movement we are returning the password for only testing purposes, this should be pass to the user email adderss
+      // password: password, // for testing purposes
       user_id: user.user_id,
       message: 'User created successfully'
     }
@@ -131,7 +136,6 @@ export class UserController {
   async logout(@Res({ passthrough: true }) response: Response) {
     response.clearCookie('jwt');
     console.log('Incoming Logout Request');
-
     return {
       message: 'Logout success'
     }
@@ -178,12 +182,17 @@ export class UserController {
     }
     // Update the email if it's different from the current one
     if (updateUser.user_email && updateUser.user_email !== user.user_email) {
+      // Check if the new email is already in use
+      const existingUser = await this.userRepo.findOne({ where: { user_email: updateUser.user_email } });
+      if (existingUser) {
+        throw new BadRequestException('Email already exists');
+      }
 
       const tempPassword = Math.random().toString(36).slice(-8);
       const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
       const mailOptions = {
-        from: 'malinthakavinda24@gmail.com',
+        from: 'taprotechnologies2@gmail.com',
         to: updateUser.user_email,
         subject: 'Tapro Project & Resource management system',
         html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>
@@ -205,7 +214,6 @@ export class UserController {
     if (updateUser.user_name && updateUser.user_name !== user.user_name) {
       user.user_name = updateUser.user_name;
     }
-
     return this.userService.updateUserById(id, user);
   }
 
@@ -214,7 +222,7 @@ export class UserController {
   @Delete(':id')
   async deleteUser(@Param('id') id: number) {
     await this.usersFunctionService.deleteUserFunction(id);
-    return this.userService.markUserAsDeletedById(id); 
+    return this.userService.markUserAsDeletedById(id);
   }
 
   // controller for searching users by user name
@@ -222,7 +230,6 @@ export class UserController {
   @Get('searchUserName/search')
   async searchUsers(@Req() req: Request) {
     const builder = await this.userService.searchUser('user_name');;
-
     if (req.query.s) {
       builder.where('user_name.user_name like :s', { s: `%${req.query.s}%` });
     }
@@ -248,7 +255,7 @@ export class UserController {
     const hashedPassword = await bcrypt.hash(tempPassword, 12);
 
     const mailOptions = {
-      from: 'malinthakavinda24@gmail.com',
+      from: 'taprotechnologies2@gmail.com',
       to: user_email,
       subject: 'Tapro Project & Resource management system',
       html: `<h2 style="color: blue;">Welcome to Tapro Resource & Project management system website!</h2>

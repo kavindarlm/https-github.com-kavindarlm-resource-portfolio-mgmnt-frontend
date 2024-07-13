@@ -28,7 +28,7 @@ export class ProjectController {
   //controller for getting all projects
   @Get()
   getPeojects() {
-    return this.projectService.findPeojects(15);
+    return this.projectService.findProjects(15);
   }
 
   //controller for creating a project
@@ -73,7 +73,7 @@ export class ProjectController {
   //controller for deleting a project
   @Delete(':id')
   async DeleteProject(@Param('id') projectid: number) {
-    await this.projectService.deleteProject(projectid.toString());
+    await this.projectService.deleteProject(projectid);
   }
 
   //controller for getting all projects count
@@ -102,13 +102,13 @@ export class ProjectController {
 
   //  controller for searching projects by project name
   @Get('searchprojectName/search')
-  async searchProjects(@Req() req: Request) {
-    const builder = await this.projectService.searchProject('projects');
-    if (req.query.s) {
-      builder.where('projects.projectName like :s', { s: `%${req.query.s}%` });
-    }
-    return builder.getMany();
+async searchProjects(@Req() req: Request) {
+  const builder = await this.projectService.searchProject('project');
+  if (req.query.s) {
+    builder.andWhere('project.projectName LIKE :s', { s: `%${req.query.s}%` });
   }
+  return await builder.getMany();
+}
 
   // controller for return all the resource id and resource name
   @Get('getResoure/bynameAndId')

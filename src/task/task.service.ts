@@ -92,8 +92,8 @@ export class TaskService {
             }
             return deleteResult;
         } catch (error) {
-            throw new NotFoundException('Could not delete task');
-        }
+            throw new NotFoundException('Could not delete task please check resource allocation and try again');
+        } 
     }
 
     //service for find tasks of project by id
@@ -207,14 +207,14 @@ export class TaskService {
     async getNotCompletedProjectCount(): Promise<number> {
         try {
             // Get all projects
-            const projects = await this.projectRepository.find();
+            const projects = await this.projectRepository.find({where: {isActive: true}});
 
             let notCompletedProjectCount = 0;
 
             // Calculate the progress for each project and count the ones with progress < 100
             for (const project of projects) {
                 const progress = await this.getProjectProgressByProjectId(project.projectid);
-                if (progress < 100) {
+                if (progress < 100 && progress > 0) {
                     notCompletedProjectCount++;
                 }
             }
